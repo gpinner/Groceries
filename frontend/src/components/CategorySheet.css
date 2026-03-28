@@ -1,3 +1,4 @@
+/* Shared sheet backdrop */
 .sheet-backdrop {
   position: absolute;
   inset: 0;
@@ -6,6 +7,7 @@
   animation: fadeIn 0.2s ease;
 }
 
+/* Sheet base */
 .category-sheet {
   position: absolute;
   bottom: 0;
@@ -13,31 +15,83 @@
   right: 0;
   background: #fff;
   border-radius: 20px 20px 0 0;
-  padding: 12px 16px 80px;
   z-index: 70;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: slideUp 0.25s ease;
 }
+
+.sheet-half { max-height: 58%; }
 
 .sheet-handle {
   width: 36px;
   height: 4px;
   background: #cbd5e0;
   border-radius: 2px;
-  margin: 0 auto 14px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
 }
 
 .sheet-title {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: #2d3748;
-  margin-bottom: 16px;
   text-align: center;
+  padding: 12px 16px 8px;
+  flex-shrink: 0;
 }
 
+/* Search */
+.sheet-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 14px 10px;
+  background: #f7fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.search-icon { font-size: 14px; flex-shrink: 0; }
+
+.sheet-search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  outline: none;
+  padding: 0;
+}
+
+.search-clear {
+  background: transparent;
+  color: #a0aec0;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* Grid */
 .category-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
+  padding: 0 14px 14px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-grid::-webkit-scrollbar { display: none; }
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 14px;
+  padding: 20px 0;
 }
 
 .category-tile {
@@ -58,25 +112,8 @@
   transform: scale(1.04);
 }
 
-.cat-emoji {
-  font-size: 24px;
-  line-height: 1;
-}
+.cat-emoji { font-size: 24px; line-height: 1; }
+.cat-name  { font-size: 10px; font-weight: 500; color: #4a5568; text-align: center; line-height: 1.2; }
 
-.cat-name {
-  font-size: 10px;
-  font-weight: 500;
-  color: #4a5568;
-  text-align: center;
-  line-height: 1.2;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }

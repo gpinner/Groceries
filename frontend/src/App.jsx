@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import AddItemForm from './components/AddItemForm.jsx';
 import CategorySheet from './components/CategorySheet.jsx';
+import ProductSheet from './components/ProductSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ListsSheet from './components/ListsSheet.jsx';
@@ -32,7 +33,7 @@ export default function App() {
   const [tab, setTab]                       = useState('all');   // 'all' | 'done'
   const [sortBy, setSortBy]                 = useState('az');
   const [showSort, setShowSort]             = useState(false);
-  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'category' | 'add'
+  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'category' | 'product' | 'add'
   const [selectedCategory, setSelectedCategory] = useState('Other');
 
   // Load lists once on mount
@@ -108,6 +109,11 @@ export default function App() {
     const item = await res.json();
     setItems(prev => [...prev, item]);
     setSheet(null);
+  };
+
+  // Quick-add a product by name from the product sheet
+  const quickAddProduct = async (name, category) => {
+    await addItem({ name, category, quantity: 1, unit: '' });
   };
 
   const updateItem = async (id, changes) => {
@@ -229,8 +235,17 @@ export default function App() {
 
       {sheet === 'category' && (
         <CategorySheet
-          onSelect={cat => { setSelectedCategory(cat); setSheet('add'); }}
+          onSelect={cat => { setSelectedCategory(cat); setSheet('product'); }}
           onClose={() => setSheet(null)}
+        />
+      )}
+
+      {sheet === 'product' && (
+        <ProductSheet
+          category={selectedCategory}
+          onAdd={quickAddProduct}
+          onBack={() => setSheet('category')}
+          onCustom={() => setSheet('add')}
         />
       )}
 
@@ -238,7 +253,7 @@ export default function App() {
         <AddItemForm
           initialCategory={selectedCategory}
           onAdd={addItem}
-          onCancel={() => setSheet('category')}
+          onCancel={() => setSheet('product')}
         />
       )}
 
