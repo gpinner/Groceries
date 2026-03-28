@@ -6,13 +6,15 @@ import './SortSheet.css';
 const SORTED_STORES = [...STORES].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange, onClose }) {
-  const mode = storeId ? 'store' : sortBy;
+  const [showStores, setShowStores] = useState(!!storeId);
+  const mode = showStores ? 'store' : sortBy;
 
   const selectMode = (m) => {
     if (m === 'store') {
-      onSortChange('az');
+      setShowStores(true);
       // stay open to let user pick a store
     } else {
+      setShowStores(false);
       onStoreChange(null);
       onSortChange(m);
       onClose();
