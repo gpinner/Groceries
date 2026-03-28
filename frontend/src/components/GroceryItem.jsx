@@ -5,111 +5,116 @@ import './GroceryItem.css';
 const UNITS = ['', 'pc', 'lb', 'oz', 'kg', 'g', 'L', 'mL', 'dozen', 'pack', 'can', 'bag', 'box'];
 
 export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
-  const [editing, setEditing] = useState(false);
-  const [name, setName]       = useState(item.name);
-  const [category, setCategory] = useState(item.category);
-  const [quantity, setQuantity] = useState(String(item.quantity));
-  const [unit, setUnit]       = useState(item.unit);
-  const [saving, setSaving]   = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [qty, setQty]           = useState(item.quantity);
+  const [editing, setEditing]   = useState(false);
+  const [editName, setEditName] = useState(item.name);
+  const [saving, setSaving]     = useState(false);
 
-  const handleSave = async () => {
-    if (!name.trim()) return;
+  // Sync qty if item changes externally
+  if (qty !== item.quantity && !menuOpen) setQty(item.quantity);
+
+  const changeQty = async (next) => {
+    const n = Math.max(0.5, Number((next).toFixed(1)));
+    setQty(n);
+    onUpdate(item.id, { quantity: n });
+  };
+
+  const handleSaveName = async () => {
+    if (!editName.trim()) return;
     setSaving(true);
     try {
-      await onUpdate(item.id, {
-        name: name.trim(), category,
-        quantity: parseFloat(quantity) || 1,
-        unit, checked: item.checked,
-      });
+      await onUpdate(item.id, { name: editName.trim() });
       setEditing(false);
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
-  const handleCancel = () => {
-    setName(item.name); setCategory(item.category);
-    setQuantity(String(item.quantity)); setUnit(item.unit);
-    setEditing(false);
-  };
+  const qtyLabel = `${item.quantity}${item.unit ? '\u202f' + item.unit : ''}`;
 
   if (editing) {
     return (
       <li className="grocery-item editing">
         <input
           className="edit-name"
-          value={name}
-          onChange={e => setName(e.target.value)}
+          value={editName}
+          onChange={e => setEditName(e.target.value)}
           autoFocus
-          placeholder="Item name"
+          onKeyDown={e => e.key === 'Enter' && handleSaveName()}
         />
-        <div className="edit-row">
-          <input
-            type="number" className="edit-qty"
-            min="0.01" step="any"
-            value={quantity} onChange={e => setQuantity(e.target.value)}
-          />
-          <select value={unit} onChange={e => setUnit(e.target.value)}>
-            {UNITS.map(u => <option key={u} value={u}>{u || '—'}</option>)}
-          </select>
-          <select value={category} onChange={e => setCategory(e.target.value)}>
-            {CATEGORIES.map(({ name: n }) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
         <div className="edit-actions">
-          <button className="save-btn" onClick={handleSave} disabled={saving || !name.trim()}>
+          <button className="save-btn" onClick={handleSaveName} disabled={saving || !editName.trim()}>
             {saving ? '…' : 'Save'}
           </button>
-          <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+          <button className="cancel-btn" onClick={() => { setEditName(item.name); setEditing(false); }}>
+            Cancel
+          </button>
         </div>
       </li>
     );
   }
 
-  const qtyLabel = item.quantity > 0
-    ? `${item.quantity}${item.unit ? '\u202f' + item.unit : ''}`
-    : null;
-
   return (
-    <li className={`grocery-item ${item.checked ? 'checked' : ''}`}>
-      {/* Large check circle — primary action */}
-      <button
-        className="check-circle"
-        onClick={() => onToggle(item.id, !item.checked)}
-        aria-label={item.checked ? 'Restore item' : 'Mark as done'}
-      >
-        <span className="check-ring" />
-        {item.checked && (
-          <svg className="check-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        )}
-        {item.checked && <span className="restore-hint">↩</span>}
-      </button>
+    <li className={`grocery-item ${item.checked ? 'checked' : ''} ${menuOpen ? 'menu-open' : ''}`}>
+      <div className="item-main">
+        {/* Large check circle */}
+        <button
+          className="check-circle"
+          onClick={() => onToggle(item.id, !item.checked)}
+          aria-label={item.checked ? 'Restore' : 'Done'}
+        >
+          <span className="check-ring" />
+          {item.checked
+            ? <svg className="check-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            : <span className="restore-hint">↩</span>
+          }
+        </button>
 
-      {/* Product info */}
-      <div className="item-info">
-        <span className="item-name">{item.name}</span>
-        {qtyLabel && <span className="item-qty">{qtyLabel}</span>}
-      </div>
+        {/* Name + qty inline */}
+        <div className="item-info" onDoubleClick={() => !item.checked && setEditing(true)}>
+          <span className="item-name">{item.name}</span>
+          <span className="item-sep">·</span>
+          <span className="item-qty">{qtyLabel}</span>
+        </div>
 
-      {/* Secondary actions */}
-      <div className="item-actions">
-        {!item.checked && (
-          <button className="edit-btn" onClick={() => setEditing(true)} aria-label="Edit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-        )}
-        <button className="delete-btn" onClick={() => onDelete(item.id)} aria-label="Delete">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-          </svg>
+        {/* 3-dot button */}
+        <button
+          className={`menu-dots ${menuOpen ? 'active' : ''}`}
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label="More options"
+        >
+          <span /><span /><span />
         </button>
       </div>
+
+      {/* Inline flyout */}
+      {menuOpen && (
+        <div className="item-flyout">
+          <div className="flyout-qty">
+            <button className="qty-btn minus" onClick={() => changeQty(qty - 1)}>−</button>
+            <span className="qty-value">{qty}{item.unit ? '\u202f' + item.unit : ''}</span>
+            <button className="qty-btn plus" onClick={() => changeQty(qty + 1)}>+</button>
+          </div>
+          <div className="flyout-divider" />
+          {!item.checked && (
+            <button className="flyout-edit" onClick={() => { setMenuOpen(false); setEditing(true); }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Rename
+            </button>
+          )}
+          <button className="flyout-delete" onClick={() => onDelete(item.id)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+            Delete
+          </button>
+        </div>
+      )}
     </li>
   );
 }

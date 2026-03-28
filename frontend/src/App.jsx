@@ -155,14 +155,21 @@ export default function App() {
   };
 
   const updateItem = async (id, changes) => {
-    const res = await fetch(`${API}/items/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(changes),
-    });
-    if (!res.ok) throw new Error('Failed to update item');
-    const updated = await res.json();
-    setItems(prev => prev.map(item => item.id === id ? updated : item));
+    // Optimistic update
+    setItems(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item));
+    try {
+      const res = await fetch(`${API}/items/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(changes),
+      });
+      if (!res.ok) throw new Error('Failed to update item');
+      const updated = await res.json();
+      setItems(prev => prev.map(item => item.id === id ? updated : item));
+    } catch (e) {
+      // Revert optimistic update on failure
+      fetchItems();
+    }
   };
 
   const deleteItem = async (id) => {

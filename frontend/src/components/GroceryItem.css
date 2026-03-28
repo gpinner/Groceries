@@ -1,186 +1,279 @@
 .grocery-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px 10px 14px;
-  gap: 14px;
-  border-bottom: 1px solid #F2F5F2;
   background: #fff;
-  transition: background 0.1s;
-  min-height: 72px;
+  border-bottom: 1px solid #F0F2F0;
 }
 
 .grocery-item:last-child { border-bottom: none; }
-.grocery-item:hover      { background: #FAFCFA; }
-.grocery-item.checked    { background: #FAFCFA; }
+
+/* Main row */
+.item-main {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 0 12px;
+  min-height: 64px;
+  gap: 12px;
+}
+
+.grocery-item.checked .item-main { opacity: 0.55; }
 
 /* ── Large check circle ── */
 .check-circle {
   position: relative;
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   border-radius: 50%;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform 0.15s;
   padding: 0;
+  transition: transform 0.12s;
 }
 
-.check-circle:hover { transform: scale(1.08); }
-.check-circle:active { transform: scale(0.94) !important; }
+.check-circle:active { transform: scale(0.92); }
 
-/* The visible ring */
 .check-ring {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2.5px solid #D8E8D8;
+  border: 2px solid #D8E8D8;
   background: #fff;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.18s, background 0.18s;
 }
 
 .check-circle:hover .check-ring {
   border-color: #27AE60;
-  background: #F0FAF4;
 }
 
-/* Checked state — filled green */
 .grocery-item.checked .check-ring {
   background: #27AE60;
   border-color: #27AE60;
 }
 
-/* SVG checkmark */
 .check-tick {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: #fff;
   z-index: 1;
+  pointer-events: none;
 }
 
-/* Restore hint — shows on hover over a checked item */
+/* Restore hint — only on checked items on hover */
 .restore-hint {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.25);
+  font-size: 16px;
+  color: rgba(39, 174, 96, 0.7);
   opacity: 0;
-  z-index: 2;
+  z-index: 1;
   transition: opacity 0.15s;
+  pointer-events: none;
 }
 
-.grocery-item.checked .check-circle:hover .restore-hint {
-  opacity: 1;
+.grocery-item.checked .check-circle:hover .restore-hint { opacity: 1; }
+.grocery-item.checked .check-circle:hover .check-ring {
+  background: #1E9B54;
+  border-color: #1E9B54;
 }
 
-/* ── Item info ── */
+/* ── Name + qty inline ── */
 .item-info {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: baseline;
+  gap: 6px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .item-name {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.2s;
+  flex-shrink: 1;
+  min-width: 0;
+  transition: color 0.18s;
 }
 
 .grocery-item.checked .item-name {
   text-decoration: line-through;
-  color: #C0C8C0;
+  color: #B8C0B8;
+}
+
+.item-sep {
+  font-size: 12px;
+  color: #C8D0C8;
+  flex-shrink: 0;
 }
 
 .item-qty {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: #B0B8B0;
-}
-
-/* ── Action buttons ── */
-.item-actions {
-  display: flex;
-  gap: 2px;
+  color: #A0A8A0;
+  white-space: nowrap;
   flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.15s;
 }
 
-.grocery-item:hover .item-actions { opacity: 1; }
-
-.edit-btn, .delete-btn {
+/* ── 3-dot button ── */
+.menu-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: transparent;
-  border-radius: 10px;
-  padding: 7px;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.12s;
+}
+
+.menu-dots span {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #C0C8C0;
+  transition: background 0.12s;
+}
+
+.menu-dots:hover,
+.menu-dots.active {
+  background: #F0F4F0;
+}
+
+.menu-dots:hover span,
+.menu-dots.active span {
+  background: #27AE60;
+}
+
+/* ── Inline flyout ── */
+.item-flyout {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 10px 16px 12px 70px;
+  background: #F8FAF8;
+  border-top: 1px solid #F0F2F0;
+  animation: expandDown 0.18s ease;
+}
+
+@keyframes expandDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Qty controls */
+.flyout-qty {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #fff;
+  border: 1.5px solid #E8EEE8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  font-weight: 300;
+  color: #27AE60;
+  background: transparent;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
-.edit-btn svg, .delete-btn svg {
+.qty-btn:hover { background: #F0FAF4; }
+.qty-btn:active { background: #E0F5E8 !important; }
+
+.qty-value {
+  min-width: 48px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  padding: 0 4px;
+  border-left: 1px solid #E8EEE8;
+  border-right: 1px solid #E8EEE8;
+}
+
+/* Divider */
+.flyout-divider {
+  flex: 1;
+}
+
+/* Edit / Delete */
+.flyout-edit,
+.flyout-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+}
+
+.flyout-edit svg,
+.flyout-delete svg {
   width: 16px;
   height: 16px;
-  color: #B0B8B0;
-  transition: color 0.12s;
 }
 
-.edit-btn:hover { background: #E8F8EE; }
-.edit-btn:hover svg { color: #27AE60; }
+.flyout-edit {
+  color: #6A7A6A;
+  margin-right: 4px;
+}
 
-.delete-btn:hover { background: #FEF0EE; }
-.delete-btn:hover svg { color: #E74C3C; }
+.flyout-edit:hover { background: #EFF8F3; color: #27AE60; }
+
+.flyout-delete { color: #E74C3C; }
+.flyout-delete:hover { background: #FEF0EE; }
 
 /* ── Edit mode ── */
 .grocery-item.editing {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-  padding: 16px 18px;
   background: #FAFCFA;
-  min-height: unset;
+  border-bottom: 1px solid #E8EEE8;
 }
+
+.grocery-item.editing .item-main { display: none; }
 
 .edit-name {
   width: 100%;
   font-size: 16px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border: 2px solid #E0E8E0;
-  border-radius: 12px;
+  border-radius: 14px;
+  margin: 14px 16px 0;
+  width: calc(100% - 32px);
   font-weight: 500;
 }
 
-.edit-name:focus { border-color: #27AE60; }
+.edit-name:focus { border-color: #27AE60; box-shadow: 0 0 0 3px rgba(39,174,96,0.1); }
 
-.edit-row {
+.edit-actions {
   display: flex;
   gap: 8px;
+  padding: 10px 16px 14px;
 }
-
-.edit-qty {
-  width: 80px;
-  padding: 10px 12px;
-  border: 2px solid #E0E8E0;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.edit-actions { display: flex; gap: 8px; }
 
 .save-btn {
   flex: 1;

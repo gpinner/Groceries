@@ -1,37 +1,30 @@
-/* Category divider — subtle, in the background */
+.category-group {
+  /* no card — flat list */
+}
+
+/* Left-aligned subtle label */
 .category-divider {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 18px 20px 8px;
+  gap: 6px;
+  padding: 20px 16px 6px;
 }
 
 .divider-emoji {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
-  opacity: 0.7;
 }
 
 .divider-label {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #B0B8B0;
-  white-space: nowrap;
+  letter-spacing: 0.09em;
+  color: #A8B4A8;
 }
 
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: #E8EDE8;
-}
-
-/* Item list — no card wrapper */
+/* Flat item list — full width, no card */
 .item-list {
   list-style: none;
   background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
