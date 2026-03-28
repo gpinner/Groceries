@@ -1,0 +1,72 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.app-header {
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #718096;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tab {
+  padding: 6px 14px;
+  background: #e2e8f0;
+  color: #4a5568;
+  font-size: 13px;
+}
+
+.tab:hover {
+  background: #cbd5e0;
+}
+
+.tab.active {
+  background: #4299e1;
+  color: #fff;
+}
+
+.clear-btn {
+  padding: 6px 14px;
+  background: #fed7d7;
+  color: #c53030;
+  font-size: 13px;
+}
+
+.clear-btn:hover {
+  background: #feb2b2;
+}
+
+.state-msg {
+  text-align: center;
+  color: #718096;
+  padding: 32px 0;
+  font-size: 15px;
+}
+
+.state-msg.error {
+  color: #c53030;
+}

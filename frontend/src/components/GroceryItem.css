@@ -1,0 +1,149 @@
+.grocery-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f4f8;
+  gap: 12px;
+  transition: background 0.1s;
+}
+
+.grocery-item:last-child {
+  border-bottom: none;
+}
+
+.grocery-item:hover {
+  background: #f7fafc;
+}
+
+.grocery-item.checked .item-name {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+
+.check-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e0 !important;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.grocery-item.checked .check-btn {
+  background: #48bb78;
+  border-color: #48bb78 !important;
+}
+
+.checkmark {
+  font-size: 13px;
+  color: #fff;
+  line-height: 1;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: 15px;
+  color: #2d3748;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-qty {
+  font-size: 13px;
+  color: #718096;
+  white-space: nowrap;
+}
+
+.item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.grocery-item:hover .item-actions {
+  opacity: 1;
+}
+
+.edit-btn, .delete-btn {
+  background: transparent;
+  padding: 4px 6px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.edit-btn:hover {
+  background: #e2e8f0;
+}
+
+.delete-btn {
+  color: #e53e3e;
+}
+
+.delete-btn:hover {
+  background: #fed7d7;
+}
+
+/* Editing state */
+.grocery-item.editing {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f7fafc;
+}
+
+.edit-row {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-row.secondary {
+  flex-wrap: wrap;
+}
+
+.edit-name {
+  flex: 1;
+}
+
+.edit-qty {
+  width: 72px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save-btn {
+  padding: 6px 16px;
+  background: #4299e1;
+  color: #fff;
+  font-weight: 600;
+}
+
+.save-btn:not(:disabled):hover {
+  background: #3182ce;
+}
+
+.cancel-btn {
+  padding: 6px 16px;
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.cancel-btn:hover {
+  background: #cbd5e0;
+}
