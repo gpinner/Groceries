@@ -7,6 +7,7 @@ import ListsSheet from './components/ListsSheet.jsx';
 import VoiceModal from './components/VoiceModal.jsx';
 import { useVoiceInput } from './hooks/useVoiceInput.js';
 import { PRODUCTS } from './data/products.js';
+import { STORES } from './data/stores.js';
 import './App.css';
 
 // Flatten product list for voice matching
@@ -42,6 +43,20 @@ function sortItems(items, sortBy) {
   });
 }
 
+function sortCategories(grouped, sortBy, storeId) {
+  const store = storeId ? STORES.find(s => s.id === storeId) : null;
+  return Object.entries(grouped).sort(([a], [b]) => {
+    if (store) {
+      const ai = store.layout.indexOf(a);
+      const bi = store.layout.indexOf(b);
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    }
+    if (sortBy === 'az') return a.localeCompare(b);
+    if (sortBy === 'za') return b.localeCompare(a);
+    return 0;
+  });
+}
+
 export default function App() {
   const [lists, setLists]                   = useState([]);
   const [currentListId, setCurrentListId]   = useState(null);
@@ -50,6 +65,7 @@ export default function App() {
   const [error, setError]                   = useState(null);
   const [tab, setTab]                       = useState('all');
   const [sortBy, setSortBy]                 = useState('az');
+  const [storeId, setStoreId]               = useState(null);
   const voice = useVoiceInput();
   const [showSort, setShowSort]             = useState(false);
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom'
@@ -203,8 +219,7 @@ export default function App() {
     return acc;
   }, {});
 
-  const sortedCategories = Object.entries(grouped)
-    .sort(([a], [b]) => a.localeCompare(b))
+  const sortedCategories = sortCategories(grouped, sortBy, storeId)
     .map(([cat, catItems]) => [cat, sortItems(catItems, sortBy)]);
 
   const checkedCount = items.filter(i => i.checked).length;
@@ -225,21 +240,36 @@ export default function App() {
           </div>
           <div className="header-right">
             <button
-              className="sort-icon-btn"
+              className={`sort-icon-btn ${storeId ? 'store-active' : ''}`}
               onClick={() => setShowSort(v => !v)}
-              aria-label="Sort options"
+              aria-label="Sort / store layout"
             >
-              ⇅
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6"  x2="21" y2="6" />
+                <line x1="6" y1="12" x2="18" y2="12" />
+                <line x1="9" y1="18" x2="15" y2="18" />
+              </svg>
             </button>
             {showSort && (
               <div className="sort-dropdown">
+                <p className="dropdown-section-label">Sort items</p>
                 {SORT_OPTIONS.map(opt => (
                   <button
                     key={opt.id}
-                    className={`sort-option ${sortBy === opt.id ? 'active' : ''}`}
-                    onClick={() => { setSortBy(opt.id); setShowSort(false); }}
+                    className={`sort-option ${!storeId && sortBy === opt.id ? 'active' : ''}`}
+                    onClick={() => { setSortBy(opt.id); setStoreId(null); setShowSort(false); }}
                   >
                     {opt.label}
+                  </button>
+                ))}
+                <p className="dropdown-section-label">Store layout</p>
+                {STORES.map(store => (
+                  <button
+                    key={store.id}
+                    className={`sort-option ${storeId === store.id ? 'active' : ''}`}
+                    onClick={() => { setStoreId(store.id); setShowSort(false); }}
+                  >
+                    {store.name}
                   </button>
                 ))}
               </div>

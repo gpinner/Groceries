@@ -78,14 +78,21 @@
   border-radius: 12px;
   background: #F0F4F0;
   color: #4A5568;
-  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 4px;
 }
 
+.sort-icon-btn svg { width: 18px; height: 18px; }
 .sort-icon-btn:hover { background: #E8F0E8; color: #27AE60; }
+
+/* Store layout active — tinted green */
+.sort-icon-btn.store-active {
+  background: #E8F8EE;
+  color: #27AE60;
+  border: 1.5px solid #C8EDD8;
+}
 
 .sort-dropdown {
   position: absolute;
@@ -93,17 +100,28 @@
   right: 0;
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.13);
   overflow: hidden;
   z-index: 200;
-  min-width: 130px;
+  min-width: 180px;
   border: 1px solid #EEF2EE;
+}
+
+.dropdown-section-label {
+  font-size: 10px;
+  font-weight: var(--fw-extrabold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #B0B8B0;
+  padding: 10px 16px 4px;
+  background: #F8FAF8;
+  border-bottom: 1px solid #F0F4F0;
 }
 
 .sort-option {
   display: block;
   width: 100%;
-  padding: 13px 18px;
+  padding: 11px 16px;
   text-align: left;
   font-size: 14px;
   font-weight: var(--fw-semibold);
@@ -115,7 +133,7 @@
 
 .sort-option:last-child { border-bottom: none; }
 .sort-option:hover      { background: #F5F7F5; }
-.sort-option.active     { color: #27AE60; }
+.sort-option.active     { color: #27AE60; font-weight: var(--fw-bold); }
 
 /* ── Scroll area ── */
 .scroll-area {
