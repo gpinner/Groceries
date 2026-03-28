@@ -3,7 +3,7 @@ import './BottomNav.css';
 
 const LONG_PRESS_MS = 380;
 
-export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsPress, onVoiceStart, onVoiceStop, isListening }) {
+export default function BottomNav({ onAddPress, onListsPress, onVoiceStart, onVoiceStop, isListening }) {
   const timerRef    = useRef(null);
   const didVoiceRef = useRef(false);
 
@@ -41,11 +41,13 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsP
 
   return (
     <nav className="bottom-nav">
-      <button
-        className={`nav-tab ${activeTab === 'lists' ? 'active' : ''}`}
-        onClick={onListsPress}
-      >
-        <span className="nav-icon">☰</span>
+      <button className="nav-tab" onClick={onListsPress}>
+        <span className="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </span>
         <span className="nav-label">Lists</span>
       </button>
 
@@ -63,12 +65,14 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsP
         </button>
       </div>
 
-      <button
-        className={`nav-tab ${activeTab === 'done' ? 'active' : ''}`}
-        onClick={() => onTabChange('done')}
-      >
-        <span className="nav-icon">✓</span>
-        <span className="nav-label">Done</span>
+      <button className="nav-tab" onClick={onListsPress}>
+        <span className="nav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </span>
+        <span className="nav-label">Store</span>
       </button>
     </nav>
   );

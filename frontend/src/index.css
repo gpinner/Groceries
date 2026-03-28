@@ -5,26 +5,25 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(160deg, #064e3b 0%, #1a1a2e 60%);
-  color: #1a202c;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+  background: #D6E8D6;
+  color: #1a1a1a;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Phone frame wrapper */
+/* Phone frame */
 #root {
   width: 390px;
   height: 844px;
-  background: #f0fdf4;
+  background: #F6F8F6;
   border-radius: 50px;
   box-shadow:
     0 0 0 10px #111,
-    0 0 0 12px #1f2937,
-    0 40px 100px rgba(0, 0, 0, 0.7),
-    0 0 60px rgba(16, 185, 129, 0.15);
+    0 0 0 12px #222,
+    0 50px 120px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -54,7 +53,7 @@ body {
   transform: translateX(-50%);
   width: 120px;
   height: 5px;
-  background: #374151;
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
   z-index: 100;
 }
@@ -62,29 +61,33 @@ body {
 button {
   cursor: pointer;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
-  transition: background 0.15s, opacity 0.15s, transform 0.15s;
+  transition: background 0.15s, opacity 0.15s, transform 0.12s;
 }
 
 button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 input, select {
   font-family: inherit;
-  font-size: 14px;
-  border: 1.5px solid #a7f3d0;
-  border-radius: 8px;
-  padding: 8px 10px;
+  font-size: 15px;
+  border: 1.5px solid #D8E8D8;
+  border-radius: 12px;
+  padding: 12px 14px;
   outline: none;
   background: #fff;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 input:focus, select:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  border-color: #27AE60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
 }

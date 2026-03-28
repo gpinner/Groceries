@@ -229,6 +229,20 @@ export default function App() {
             )}
           </div>
         </div>
+        <div className="tab-row">
+          <button
+            className={`tab-btn ${tab === 'all' ? 'active' : ''}`}
+            onClick={() => setTab('all')}
+          >
+            Shopping
+          </button>
+          <button
+            className={`tab-btn ${tab === 'done' ? 'active' : ''}`}
+            onClick={() => setTab('done')}
+          >
+            Done {checkedCount > 0 ? `(${checkedCount})` : ''}
+          </button>
+        </div>
       </header>
 
       <div className="scroll-area" onClick={() => setShowSort(false)}>
@@ -296,8 +310,6 @@ export default function App() {
       )}
 
       <BottomNav
-        activeTab={tab}
-        onTabChange={setTab}
         onAddPress={() => setSheet('add')}
         onListsPress={() => setSheet('lists')}
         onVoiceStart={handleVoiceStart}

@@ -1,30 +1,31 @@
 .grocery-item {
   display: flex;
   align-items: center;
-  padding: 12px 14px;
-  gap: 10px;
-  border-bottom: 1px solid #f0fdf4;
+  padding: 14px 18px;
+  gap: 14px;
+  border-bottom: 1px solid #F5F7F5;
+  background: #fff;
   transition: background 0.1s;
 }
 
 .grocery-item:last-child { border-bottom: none; }
-.grocery-item:hover      { background: #f9fffe; }
+.grocery-item:hover      { background: #FAFCFA; }
 
-.grocery-item.checked { background: #f9fafb; }
+.grocery-item.checked { background: #FAFCFA; }
 .grocery-item.checked .item-name {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: #B0B8B0;
 }
 
 /* Checkbox */
 .check-btn {
-  width: 26px;
-  height: 26px;
-  min-width: 26px;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
   border-radius: 50%;
-  border: 2px solid #a7f3d0 !important;
+  border: 2.5px solid #D8E8D8 !important;
   background: #fff;
-  font-size: 13px;
+  font-size: 14px;
   color: #fff;
   display: flex;
   align-items: center;
@@ -32,11 +33,11 @@
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
 
-.check-btn:hover { transform: scale(1.1); }
+.check-btn:hover { transform: scale(1.12); border-color: #27AE60 !important; }
 
 .grocery-item.checked .check-btn {
-  background: linear-gradient(135deg, #059669, #10b981);
-  border-color: #10b981 !important;
+  background: #27AE60;
+  border-color: #27AE60 !important;
 }
 
 /* Item info */
@@ -44,14 +45,14 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
 .item-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -59,57 +60,72 @@
 
 .item-qty {
   font-size: 12px;
-  color: #6b7280;
+  font-weight: 500;
+  color: #8A9099;
 }
 
-/* Actions — always visible */
-.item-actions { display: flex; gap: 2px; flex-shrink: 0; }
+/* Actions */
+.item-actions { display: flex; gap: 4px; flex-shrink: 0; }
 
 .edit-btn, .delete-btn {
   background: transparent;
-  border-radius: 8px;
-  padding: 4px 6px;
-  font-size: 15px;
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-size: 16px;
+  color: #8A9099;
 }
 
-.edit-btn:hover   { background: #ecfdf5; }
-.delete-btn:hover { background: #fef2f2; }
+.edit-btn:hover   { background: #E8F8EE; color: #27AE60; }
+.delete-btn:hover { background: #FEF0EE; color: #E74C3C; }
 
 /* Edit mode */
 .grocery-item.editing {
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
-  padding: 12px 14px;
-  background: #f0fdf4;
+  gap: 10px;
+  padding: 16px 18px;
+  background: #FAFCFA;
 }
 
-.edit-name { width: 100%; font-size: 15px; }
+.edit-name {
+  width: 100%;
+  font-size: 15px;
+  padding: 12px 14px;
+  border: 1.5px solid #D8E8D8;
+  border-radius: 12px;
+}
 
 .edit-row { display: flex; gap: 8px; }
 
-.edit-qty { width: 70px; }
+.edit-qty {
+  width: 80px;
+  padding: 10px 12px;
+  border: 1.5px solid #D8E8D8;
+  border-radius: 12px;
+}
 
 .edit-actions { display: flex; gap: 8px; }
 
 .save-btn {
   flex: 1;
-  padding: 8px;
-  background: linear-gradient(135deg, #059669, #10b981);
+  padding: 12px;
+  background: #27AE60;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
-  border-radius: 8px;
+  border-radius: 12px;
+  letter-spacing: 0.2px;
 }
 
-.save-btn:not(:disabled):hover { opacity: 0.9; }
+.save-btn:not(:disabled):hover { background: #1E9B54; }
 
 .cancel-btn {
-  padding: 8px 14px;
-  background: #f3f4f6;
-  color: #374151;
+  padding: 12px 18px;
+  background: #F0F4F0;
+  color: #4A5568;
   font-size: 14px;
-  border-radius: 8px;
+  font-weight: 600;
+  border-radius: 12px;
 }
 
-.cancel-btn:hover { background: #e5e7eb; }
+.cancel-btn:hover { background: #E5EBE5; }

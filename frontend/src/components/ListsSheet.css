@@ -4,93 +4,98 @@
   left: 0;
   right: 0;
   background: #fff;
-  border-radius: 20px 20px 0 0;
-  padding: 12px 16px 80px;
+  border-radius: 28px 28px 0 0;
+  padding: 0 0 90px;
   z-index: 70;
-  animation: slideUp 0.25s ease;
-  max-height: 80%;
+  animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 82%;
   overflow-y: auto;
 }
 
+.lists-sheet::-webkit-scrollbar { display: none; }
+
 .sheet-handle {
-  width: 36px;
+  width: 44px;
   height: 4px;
-  background: #d1fae5;
+  background: #E0E8E0;
   border-radius: 2px;
-  margin: 0 auto 14px;
+  margin: 14px auto 0;
 }
 
 .sheet-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #065f46;
-  margin-bottom: 14px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+  padding: 16px 20px 12px;
+  letter-spacing: -0.4px;
 }
 
 .lists-ul {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  padding: 0 16px;
   margin-bottom: 14px;
 }
 
 .list-item {
   display: flex;
   align-items: center;
-  border-radius: 12px;
-  background: #f0fdf4;
-  border: 1.5px solid transparent;
+  border-radius: 16px;
+  background: #F6F8F6;
+  border: 2px solid transparent;
   overflow: hidden;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .list-item.active {
-  border-color: #059669;
-  background: #ecfdf5;
+  border-color: #27AE60;
+  background: #EFF8F3;
 }
 
 .list-name-btn {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 15px 16px;
   background: transparent;
   border-radius: 0;
   text-align: left;
 }
 
 .list-check {
-  width: 18px;
-  font-size: 14px;
-  color: #059669;
-  font-weight: 700;
+  width: 20px;
+  font-size: 16px;
+  color: #27AE60;
+  font-weight: 800;
   flex-shrink: 0;
 }
 
 .list-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: #065f46;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
 .list-actions {
   display: flex;
   gap: 2px;
-  padding-right: 8px;
+  padding-right: 10px;
 }
 
 .list-icon-btn {
   background: transparent;
-  padding: 6px;
-  font-size: 15px;
-  border-radius: 8px;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 10px;
+  color: #8A9099;
 }
 
-.list-icon-btn:hover { background: #d1fae5; }
-.list-icon-btn.delete:hover { background: #fff5f5; }
-.list-icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.list-icon-btn:hover { background: #E8F8EE; color: #27AE60; }
+.list-icon-btn.delete:hover { background: #FEF0EE; color: #E74C3C; }
+.list-icon-btn:disabled { opacity: 0.25; cursor: not-allowed; }
 
 /* Inline edit/create row */
 .list-edit-row,
@@ -99,52 +104,58 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 6px 8px;
+  padding: 8px 10px;
 }
 
 .list-name-input {
   flex: 1;
-  font-size: 14px;
-  padding: 7px 10px;
-  border: 1.5px solid #059669;
-  border-radius: 8px;
+  font-size: 15px;
+  padding: 11px 14px;
+  border: 2px solid #27AE60;
+  border-radius: 12px;
   outline: none;
   background: #fff;
+  font-weight: 500;
 }
 
 .list-save-btn {
-  padding: 7px 14px;
-  background: #059669;
+  padding: 11px 18px;
+  background: #27AE60;
   color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
 }
 
-.list-save-btn:hover { background: #047857; }
+.list-save-btn:hover { background: #1E9B54; }
 
 .list-cancel-btn {
-  padding: 7px 10px;
-  background: #d1fae5;
-  color: #374151;
-  font-size: 13px;
-  border-radius: 8px;
-}
-
-.new-list-btn {
-  width: 100%;
-  padding: 12px;
-  background: #f0fdf4;
-  border: 1.5px dashed #d1fae5;
-  border-radius: 12px;
+  padding: 11px 14px;
+  background: #F0F4F0;
+  color: #4A5568;
   font-size: 14px;
   font-weight: 600;
-  color: #059669;
+  border-radius: 12px;
+}
+
+.list-cancel-btn:hover { background: #E5EBE5; }
+
+.new-list-btn {
+  width: calc(100% - 32px);
+  margin: 0 16px;
+  padding: 16px;
+  background: #F6F8F6;
+  border: 2px dashed #D8E8D8 !important;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #27AE60;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .new-list-btn:hover {
-  background: #ecfdf5;
-  border-color: #059669;
+  background: #EFF8F3;
+  border-color: #27AE60 !important;
 }
 
 @keyframes slideUp {

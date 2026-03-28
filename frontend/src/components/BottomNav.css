@@ -3,15 +3,15 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 72px;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid #d1fae5;
+  height: 80px;
+  background: #ffffff;
+  border-top: 1px solid #EEF2EE;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
   z-index: 50;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .nav-tab {
@@ -19,17 +19,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   background: transparent;
   border-radius: 0;
   padding: 8px 0;
-  color: #9ca3af;
+  color: #B0B8B0;
   transition: color 0.15s;
 }
 
-.nav-tab.active { color: #059669; }
-.nav-icon  { font-size: 18px; line-height: 1; }
-.nav-label { font-size: 11px; font-weight: 600; }
+.nav-tab.active { color: #27AE60; }
+.nav-icon  { font-size: 20px; line-height: 1; }
+.nav-label { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
 
 /* Center slot */
 .nav-center {
@@ -42,17 +42,19 @@
 
 /* FAB */
 .add-fab {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #047857 0%, #10b981 100%);
+  background: #27AE60;
   color: #fff;
-  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.45), 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow:
+    0 6px 20px rgba(39, 174, 96, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  bottom: 6px;
+  bottom: 8px;
   transition: transform 0.15s, box-shadow 0.15s, background 0.25s;
   user-select: none;
   -webkit-user-select: none;
@@ -61,87 +63,47 @@
 }
 
 .add-fab:hover:not(.listening) {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.55);
+  transform: scale(1.07);
+  box-shadow: 0 8px 28px rgba(39, 174, 96, 0.55);
 }
 
-/* Listening state — red recording indicator */
+.add-fab:active:not(.listening) {
+  transform: scale(0.96) !important;
+}
+
+/* Listening state */
 .add-fab.listening {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5);
+  background: #E74C3C;
+  box-shadow: 0 6px 24px rgba(231, 76, 60, 0.5);
   transform: scale(1.1);
 }
 
 .fab-icon {
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
   margin-top: -2px;
+  font-weight: 300;
   transition: all 0.2s;
 }
 
 /* Pulse rings */
 .pulse-ring {
   position: absolute;
-  bottom: 6px;
-  width: 58px;
-  height: 58px;
+  bottom: 8px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(220, 38, 38, 0.6);
+  border: 2.5px solid rgba(231, 76, 60, 0.5);
   animation: pulse 1.4s ease-out infinite;
   z-index: 1;
 }
 
 .pulse-ring-delay {
-  animation-delay: 0.5s;
-  border-color: rgba(220, 38, 38, 0.35);
+  animation-delay: 0.55s;
+  border-color: rgba(231, 76, 60, 0.25);
 }
 
 @keyframes pulse {
-  0%   { transform: scale(1);    opacity: 1; }
-  100% { transform: scale(2.2);  opacity: 0; }
-}
-
-/* Voice transcript bubble */
-.voice-bubble {
-  position: absolute;
-  bottom: 74px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #1f2937, #111827);
-  color: #fff;
-  border-radius: 14px;
-  padding: 8px 14px;
-  white-space: nowrap;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-  z-index: 3;
-  animation: popUp 0.2s ease;
-}
-
-/* Small caret */
-.voice-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: #1f2937;
-  border-bottom: none;
-}
-
-.voice-bubble-text {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@keyframes popUp {
-  from { transform: translateX(-50%) translateY(6px); opacity: 0; }
-  to   { transform: translateX(-50%) translateY(0);   opacity: 1; }
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(2.3); opacity: 0; }
 }
