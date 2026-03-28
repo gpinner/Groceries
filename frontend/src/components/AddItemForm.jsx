@@ -8,7 +8,7 @@ const CATEGORIES = [
 
 const UNITS = ['', 'pc', 'lb', 'oz', 'kg', 'g', 'L', 'mL', 'dozen', 'pack', 'can', 'bag', 'box'];
 
-export default function AddItemForm({ onAdd }) {
+export default function AddItemForm({ onAdd, onCancel }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Other');
   const [quantity, setQuantity] = useState('1');
@@ -41,11 +41,9 @@ export default function AddItemForm({ onAdd }) {
           placeholder="Item name..."
           value={name}
           onChange={e => setName(e.target.value)}
+          autoFocus
           required
         />
-        <button type="submit" className="add-btn" disabled={submitting || !name.trim()}>
-          {submitting ? '...' : 'Add'}
-        </button>
       </div>
       <div className="add-form-row secondary">
         <input
@@ -69,6 +67,14 @@ export default function AddItemForm({ onAdd }) {
         </select>
       </div>
       {error && <p className="form-error">{error}</p>}
+      <div className="add-form-row actions">
+        <button type="submit" className="add-btn" disabled={submitting || !name.trim()}>
+          {submitting ? '...' : 'Add Item'}
+        </button>
+        {onCancel && (
+          <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
+        )}
+      </div>
     </form>
   );
 }

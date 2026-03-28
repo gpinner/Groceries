@@ -9,7 +9,8 @@ export default function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'checked'
+  const [filter, setFilter] = useState('all');
+  const [showAdd, setShowAdd] = useState(false);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -37,6 +38,7 @@ export default function App() {
     setItems(prev => [...prev, item].sort((a, b) =>
       a.category.localeCompare(b.category) || a.name.localeCompare(b.name)
     ));
+    setShowAdd(false);
   };
 
   const updateItem = async (id, changes) => {
@@ -87,8 +89,6 @@ export default function App() {
         </p>
       </header>
 
-      <AddItemForm onAdd={addItem} />
-
       <div className="controls">
         <div className="filter-tabs">
           {['all', 'pending', 'checked'].map(f => (
@@ -103,30 +103,44 @@ export default function App() {
         </div>
         {checkedCount > 0 && (
           <button className="clear-btn" onClick={clearChecked}>
-            Clear checked ({checkedCount})
+            Clear ({checkedCount})
           </button>
         )}
       </div>
 
-      {loading && <p className="state-msg">Loading...</p>}
-      {error && <p className="state-msg error">{error}</p>}
+      <div className="scroll-area">
+        {loading && <p className="state-msg">Loading...</p>}
+        {error && <p className="state-msg error">{error}</p>}
 
-      {!loading && !error && Object.keys(grouped).length === 0 && (
-        <p className="state-msg">
-          {filter === 'all' ? 'Add your first item above.' : 'No items here.'}
-        </p>
+        {!loading && !error && Object.keys(grouped).length === 0 && (
+          <p className="state-msg">
+            {filter === 'all' ? 'Tap + to add your first item.' : 'No items here.'}
+          </p>
+        )}
+
+        {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, items]) => (
+          <CategoryGroup
+            key={category}
+            category={category}
+            items={items}
+            onToggle={(id, checked) => updateItem(id, { checked })}
+            onDelete={deleteItem}
+            onUpdate={updateItem}
+          />
+        ))}
+      </div>
+
+      {showAdd && (
+        <div className="add-bar">
+          <AddItemForm onAdd={addItem} onCancel={() => setShowAdd(false)} />
+        </div>
       )}
 
-      {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, items]) => (
-        <CategoryGroup
-          key={category}
-          category={category}
-          items={items}
-          onToggle={(id, checked) => updateItem(id, { checked })}
-          onDelete={deleteItem}
-          onUpdate={updateItem}
-        />
-      ))}
+      {!showAdd && (
+        <button className="fab" onClick={() => setShowAdd(true)} aria-label="Add item">
+          +
+        </button>
+      )}
     </div>
   );
 }
