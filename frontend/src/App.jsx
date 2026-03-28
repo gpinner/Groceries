@@ -4,7 +4,27 @@ import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ListsSheet from './components/ListsSheet.jsx';
+import { PRODUCTS } from './data/products.js';
 import './App.css';
+
+// Flatten product list for voice matching
+const VOICE_PRODUCTS = Object.entries(PRODUCTS).flatMap(([cat, { common, all }]) =>
+  [...new Set([...common, ...all])].map(name => ({ name, category: cat }))
+);
+
+function matchVoiceToProduct(transcript) {
+  const t = transcript.toLowerCase();
+  // Exact match first
+  const exact = VOICE_PRODUCTS.find(p => p.name.toLowerCase() === t);
+  if (exact) return exact;
+  // Substring match — prefer shorter names (more specific)
+  const sub = VOICE_PRODUCTS
+    .filter(p => t.includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(t))
+    .sort((a, b) => a.name.length - b.name.length);
+  if (sub.length) return sub[0];
+  // No match — use transcript as-is in Other
+  return { name: transcript.charAt(0).toUpperCase() + transcript.slice(1), category: 'Other' };
+}
 
 const API = '/api';
 
@@ -112,6 +132,11 @@ export default function App() {
 
   const quickAdd = async (name, category) => {
     await addItem({ name, category, quantity: 1, unit: '' });
+  };
+
+  const handleVoiceResult = async (transcript) => {
+    const { name, category } = matchVoiceToProduct(transcript);
+    await quickAdd(name, category);
   };
 
   const updateItem = async (id, changes) => {
@@ -251,6 +276,7 @@ export default function App() {
         activeTab={tab}
         onTabChange={setTab}
         onAddPress={() => setSheet('add')}
+        onVoiceResult={handleVoiceResult}
         onListsPress={() => setSheet('lists')}
       />
     </div>
