@@ -3,7 +3,7 @@ import AddItemForm from './components/AddItemForm.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
 import './App.css';
 
-const API = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+const API = '/api';
 
 export default function App() {
   const [items, setItems] = useState([]);
