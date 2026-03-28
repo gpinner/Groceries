@@ -86,28 +86,3 @@ input, select {
 input:focus, select:focus {
   border-color: #4299e1;
 }
-
-/* Floating action button */
-.fab {
-  position: absolute;
-  bottom: 24px;
-  right: 20px;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: #4299e1;
-  color: #fff;
-  font-size: 28px;
-  line-height: 1;
-  box-shadow: 0 4px 16px rgba(66, 153, 225, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: background 0.15s, transform 0.15s;
-}
-
-.fab:hover {
-  background: #3182ce;
-  transform: scale(1.08);
-}

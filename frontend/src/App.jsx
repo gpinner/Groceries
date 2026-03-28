@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import AddItemForm from './components/AddItemForm.jsx';
+import CategorySheet from './components/CategorySheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
+import BottomNav from './components/BottomNav.jsx';
 import './App.css';
 
 const API = '/api';
@@ -9,8 +11,9 @@ export default function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all');
-  const [showAdd, setShowAdd] = useState(false);
+  const [tab, setTab] = useState('all');           // 'all' | 'checked'
+  const [sheet, setSheet] = useState(null);        // null | 'category' | 'add'
+  const [selectedCategory, setSelectedCategory] = useState('Other');
 
   const fetchItems = useCallback(async () => {
     try {
@@ -38,7 +41,7 @@ export default function App() {
     setItems(prev => [...prev, item].sort((a, b) =>
       a.category.localeCompare(b.category) || a.name.localeCompare(b.name)
     ));
-    setShowAdd(false);
+    setSheet(null);
   };
 
   const updateItem = async (id, changes) => {
@@ -60,15 +63,18 @@ export default function App() {
 
   const clearChecked = async () => {
     const res = await fetch(`${API}/items/checked/all`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to clear checked items');
+    if (!res.ok) throw new Error('Failed to clear items');
     setItems(prev => prev.filter(item => !item.checked));
   };
 
-  const filtered = items.filter(item => {
-    if (filter === 'pending') return !item.checked;
-    if (filter === 'checked') return item.checked;
-    return true;
-  });
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setSheet('add');
+  };
+
+  const filtered = tab === 'checked'
+    ? items.filter(i => i.checked)
+    : items.filter(i => !i.checked);
 
   const grouped = filtered.reduce((acc, item) => {
     acc[item.category] = acc[item.category] || [];
@@ -77,36 +83,18 @@ export default function App() {
   }, {});
 
   const checkedCount = items.filter(i => i.checked).length;
+  const pendingCount = items.filter(i => !i.checked).length;
 
   return (
     <div className="app">
       <header className="app-header">
         <h1>Grocery List</h1>
         <p className="subtitle">
-          {items.length === 0
+          {pendingCount === 0 && checkedCount === 0
             ? 'Your list is empty'
-            : `${checkedCount} of ${items.length} items checked`}
+            : `${pendingCount} to buy · ${checkedCount} done`}
         </p>
       </header>
-
-      <div className="controls">
-        <div className="filter-tabs">
-          {['all', 'pending', 'checked'].map(f => (
-            <button
-              key={f}
-              className={`tab ${filter === f ? 'active' : ''}`}
-              onClick={() => setFilter(f)}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
-        </div>
-        {checkedCount > 0 && (
-          <button className="clear-btn" onClick={clearChecked}>
-            Clear ({checkedCount})
-          </button>
-        )}
-      </div>
 
       <div className="scroll-area">
         {loading && <p className="state-msg">Loading...</p>}
@@ -114,33 +102,48 @@ export default function App() {
 
         {!loading && !error && Object.keys(grouped).length === 0 && (
           <p className="state-msg">
-            {filter === 'all' ? 'Tap + to add your first item.' : 'No items here.'}
+            {tab === 'all' ? 'Tap + to add your first item.' : 'Nothing done yet.'}
           </p>
         )}
 
-        {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, items]) => (
+        {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, catItems]) => (
           <CategoryGroup
             key={category}
             category={category}
-            items={items}
+            items={catItems}
             onToggle={(id, checked) => updateItem(id, { checked })}
             onDelete={deleteItem}
             onUpdate={updateItem}
           />
         ))}
+
+        {tab === 'checked' && checkedCount > 0 && (
+          <button className="clear-all-btn" onClick={clearChecked}>
+            Clear all done items
+          </button>
+        )}
       </div>
 
-      {showAdd && (
-        <div className="add-bar">
-          <AddItemForm onAdd={addItem} onCancel={() => setShowAdd(false)} />
-        </div>
+      {sheet === 'category' && (
+        <CategorySheet
+          onSelect={handleCategorySelect}
+          onClose={() => setSheet(null)}
+        />
       )}
 
-      {!showAdd && (
-        <button className="fab" onClick={() => setShowAdd(true)} aria-label="Add item">
-          +
-        </button>
+      {sheet === 'add' && (
+        <AddItemForm
+          initialCategory={selectedCategory}
+          onAdd={addItem}
+          onCancel={() => setSheet('category')}
+        />
       )}
+
+      <BottomNav
+        activeTab={tab}
+        onTabChange={setTab}
+        onAddPress={() => setSheet('category')}
+      />
     </div>
   );
 }

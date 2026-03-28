@@ -1,16 +1,12 @@
 import { useState } from 'react';
+import { CATEGORIES } from './CategorySheet.jsx';
 import './AddItemForm.css';
-
-const CATEGORIES = [
-  'Produce', 'Dairy', 'Meat & Seafood', 'Bakery', 'Frozen',
-  'Pantry', 'Beverages', 'Snacks', 'Household', 'Other',
-];
 
 const UNITS = ['', 'pc', 'lb', 'oz', 'kg', 'g', 'L', 'mL', 'dozen', 'pack', 'can', 'bag', 'box'];
 
-export default function AddItemForm({ onAdd, onCancel }) {
+export default function AddItemForm({ initialCategory = 'Other', onAdd, onCancel }) {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('Other');
+  const [category, setCategory] = useState(initialCategory);
   const [quantity, setQuantity] = useState('1');
   const [unit, setUnit] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -32,49 +28,56 @@ export default function AddItemForm({ onAdd, onCancel }) {
     }
   };
 
+  const catEmoji = CATEGORIES.find(c => c.name === category)?.emoji ?? '📦';
+
   return (
-    <form className="add-form" onSubmit={handleSubmit}>
-      <div className="add-form-row primary">
-        <input
-          className="name-input"
-          type="text"
-          placeholder="Item name..."
-          value={name}
-          onChange={e => setName(e.target.value)}
-          autoFocus
-          required
-        />
-      </div>
-      <div className="add-form-row secondary">
-        <input
-          type="number"
-          className="qty-input"
-          min="0.01"
-          step="any"
-          value={quantity}
-          onChange={e => setQuantity(e.target.value)}
-          aria-label="Quantity"
-        />
-        <select value={unit} onChange={e => setUnit(e.target.value)} aria-label="Unit">
-          {UNITS.map(u => (
-            <option key={u} value={u}>{u || '—'}</option>
-          ))}
-        </select>
-        <select value={category} onChange={e => setCategory(e.target.value)} aria-label="Category">
-          {CATEGORIES.map(c => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-      </div>
-      {error && <p className="form-error">{error}</p>}
-      <div className="add-form-row actions">
-        <button type="submit" className="add-btn" disabled={submitting || !name.trim()}>
-          {submitting ? '...' : 'Add Item'}
-        </button>
-        {onCancel && (
+    <>
+      <div className="sheet-backdrop" onClick={onCancel} />
+      <form className="add-form" onSubmit={handleSubmit}>
+        <div className="sheet-handle" />
+        <div className="add-category-label">
+          <span>{catEmoji}</span> {category}
+        </div>
+        <div className="add-form-row">
+          <input
+            className="name-input"
+            type="text"
+            placeholder="Item name..."
+            value={name}
+            onChange={e => setName(e.target.value)}
+            autoFocus
+            required
+          />
+        </div>
+        <div className="add-form-row">
+          <input
+            type="number"
+            className="qty-input"
+            min="0.01"
+            step="any"
+            value={quantity}
+            onChange={e => setQuantity(e.target.value)}
+            aria-label="Quantity"
+          />
+          <select value={unit} onChange={e => setUnit(e.target.value)} aria-label="Unit">
+            {UNITS.map(u => (
+              <option key={u} value={u}>{u || '—'}</option>
+            ))}
+          </select>
+          <select value={category} onChange={e => setCategory(e.target.value)} aria-label="Category" className="cat-select">
+            {CATEGORIES.map(({ name: n }) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+        </div>
+        {error && <p className="form-error">{error}</p>}
+        <div className="add-form-row actions">
+          <button type="submit" className="add-btn" disabled={submitting || !name.trim()}>
+            {submitting ? '...' : 'Add Item'}
+          </button>
           <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
-        )}
-      </div>
-    </form>
+        </div>
+      </form>
+    </>
   );
 }
