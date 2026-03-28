@@ -17,9 +17,12 @@ export default function AddSheet({ onAdd, onCustom, onClose }) {
   // Expand once — never shrink
   const expand = () => { if (!expanded) setExpanded(true); };
 
+  const capitalize = (val) => val ? val.charAt(0).toUpperCase() + val.slice(1) : val;
+
   const handleQueryChange = (val) => {
-    setQuery(val);
-    if (val) { expand(); setSelectedCat(null); }
+    const capitalized = capitalize(val);
+    setQuery(capitalized);
+    if (capitalized) { expand(); setSelectedCat(null); }
   };
 
   const handleCatSelect = (cat) => {

@@ -1,8 +1,9 @@
 .category-group {
   background: #fff;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.08), 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid #d1fae5;
 }
 
 .category-header {
@@ -10,33 +11,28 @@
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: #f7fafc;
-  border-bottom: 1px solid #edf2f7;
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+  border-bottom: 1px solid #d1fae5;
 }
 
-.category-emoji {
-  font-size: 18px;
-  line-height: 1;
-}
+.category-emoji { font-size: 18px; line-height: 1; }
 
 .category-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #4a5568;
+  letter-spacing: 0.06em;
+  color: #065f46;
   flex: 1;
 }
 
 .category-count {
   font-size: 11px;
   font-weight: 600;
-  color: #a0aec0;
-  background: #edf2f7;
-  padding: 2px 7px;
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 8px;
   border-radius: 10px;
 }
 
-.item-list {
-  list-style: none;
-}
+.item-list { list-style: none; }

@@ -6,7 +6,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1a1a2e;
+  background: linear-gradient(160deg, #064e3b 0%, #1a1a2e 60%);
   color: #1a202c;
   min-height: 100vh;
   display: flex;
@@ -18,12 +18,13 @@ body {
 #root {
   width: 390px;
   height: 844px;
-  background: #f0f4f8;
+  background: #f0fdf4;
   border-radius: 50px;
   box-shadow:
     0 0 0 10px #111,
-    0 0 0 12px #333,
-    0 40px 80px rgba(0, 0, 0, 0.6);
+    0 0 0 12px #1f2937,
+    0 40px 100px rgba(0, 0, 0, 0.7),
+    0 0 60px rgba(16, 185, 129, 0.15);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -53,7 +54,7 @@ body {
   transform: translateX(-50%);
   width: 120px;
   height: 5px;
-  background: #333;
+  background: #374151;
   border-radius: 3px;
   z-index: 100;
 }
@@ -64,25 +65,26 @@ button {
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s, opacity 0.15s, transform 0.15s;
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 input, select {
   font-family: inherit;
   font-size: 14px;
-  border: 1.5px solid #cbd5e0;
-  border-radius: 6px;
+  border: 1.5px solid #a7f3d0;
+  border-radius: 8px;
   padding: 8px 10px;
   outline: none;
   background: #fff;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 input:focus, select:focus {
-  border-color: #4299e1;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }

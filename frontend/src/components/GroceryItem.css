@@ -3,22 +3,17 @@
   align-items: center;
   padding: 12px 14px;
   gap: 10px;
-  border-bottom: 1px solid #f0f4f8;
+  border-bottom: 1px solid #f0fdf4;
   transition: background 0.1s;
 }
 
-.grocery-item:last-child {
-  border-bottom: none;
-}
+.grocery-item:last-child { border-bottom: none; }
+.grocery-item:hover      { background: #f9fffe; }
 
-/* Checked state */
-.grocery-item.checked {
-  background: #f9fafb;
-}
-
+.grocery-item.checked { background: #f9fafb; }
 .grocery-item.checked .item-name {
   text-decoration: line-through;
-  color: #a0aec0;
+  color: #9ca3af;
 }
 
 /* Checkbox */
@@ -27,19 +22,21 @@
   height: 26px;
   min-width: 26px;
   border-radius: 50%;
-  border: 2px solid #cbd5e0 !important;
+  border: 2px solid #a7f3d0 !important;
   background: #fff;
   font-size: 13px;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
 
+.check-btn:hover { transform: scale(1.1); }
+
 .grocery-item.checked .check-btn {
-  background: #48bb78;
-  border-color: #48bb78 !important;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border-color: #10b981 !important;
 }
 
 /* Item info */
@@ -54,7 +51,7 @@
 .item-name {
   font-size: 15px;
   font-weight: 500;
-  color: #2d3748;
+  color: #1f2937;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -62,15 +59,11 @@
 
 .item-qty {
   font-size: 12px;
-  color: #718096;
+  color: #6b7280;
 }
 
-/* Action buttons — always visible on mobile */
-.item-actions {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-}
+/* Actions — always visible */
+.item-actions { display: flex; gap: 2px; flex-shrink: 0; }
 
 .edit-btn, .delete-btn {
   background: transparent;
@@ -79,8 +72,8 @@
   font-size: 15px;
 }
 
-.edit-btn:hover  { background: #edf2f7; }
-.delete-btn:hover { background: #fff5f5; }
+.edit-btn:hover   { background: #ecfdf5; }
+.delete-btn:hover { background: #fef2f2; }
 
 /* Edit mode */
 .grocery-item.editing {
@@ -88,46 +81,35 @@
   align-items: stretch;
   gap: 8px;
   padding: 12px 14px;
-  background: #f7fafc;
+  background: #f0fdf4;
 }
 
-.edit-name {
-  width: 100%;
-  font-size: 15px;
-}
+.edit-name { width: 100%; font-size: 15px; }
 
-.edit-row {
-  display: flex;
-  gap: 8px;
-}
+.edit-row { display: flex; gap: 8px; }
 
-.edit-qty {
-  width: 70px;
-}
+.edit-qty { width: 70px; }
 
-.edit-actions {
-  display: flex;
-  gap: 8px;
-}
+.edit-actions { display: flex; gap: 8px; }
 
 .save-btn {
   flex: 1;
   padding: 8px;
-  background: #4299e1;
+  background: linear-gradient(135deg, #059669, #10b981);
   color: #fff;
   font-weight: 600;
   font-size: 14px;
   border-radius: 8px;
 }
 
-.save-btn:not(:disabled):hover { background: #3182ce; }
+.save-btn:not(:disabled):hover { opacity: 0.9; }
 
 .cancel-btn {
   padding: 8px 14px;
-  background: #e2e8f0;
-  color: #4a5568;
+  background: #f3f4f6;
+  color: #374151;
   font-size: 14px;
   border-radius: 8px;
 }
 
-.cancel-btn:hover { background: #cbd5e0; }
+.cancel-btn:hover { background: #e5e7eb; }
