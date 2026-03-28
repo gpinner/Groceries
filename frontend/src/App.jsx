@@ -263,15 +263,18 @@ export default function App() {
                   </button>
                 ))}
                 <p className="dropdown-section-label">Store layout</p>
-                {STORES.map(store => (
-                  <button
-                    key={store.id}
-                    className={`sort-option ${storeId === store.id ? 'active' : ''}`}
-                    onClick={() => { setStoreId(store.id); setShowSort(false); }}
+                <div className="store-select-row">
+                  <select
+                    className="store-select"
+                    value={storeId ?? ''}
+                    onChange={e => { setStoreId(e.target.value || null); setShowSort(false); }}
                   >
-                    {store.name}
-                  </button>
-                ))}
+                    <option value="">— No store —</option>
+                    {STORES.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
           </div>
