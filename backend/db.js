@@ -1,20 +1,20 @@
-import Database from 'better-sqlite3';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import pg from 'pg';
+const { Pool } = pg;
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const db = new Database(join(__dirname, 'groceries.db'));
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    category TEXT NOT NULL DEFAULT 'Other',
-    quantity REAL NOT NULL DEFAULT 1,
-    unit TEXT NOT NULL DEFAULT '',
-    checked INTEGER NOT NULL DEFAULT 0,
-    created_at INTEGER NOT NULL DEFAULT (unixepoch())
-  )
-`);
+export async function init() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS items (
+      id        SERIAL PRIMARY KEY,
+      name      TEXT    NOT NULL,
+      category  TEXT    NOT NULL DEFAULT 'Other',
+      quantity  REAL    NOT NULL DEFAULT 1,
+      unit      TEXT    NOT NULL DEFAULT '',
+      checked   BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at BIGINT NOT NULL DEFAULT extract(epoch from now())::bigint
+    )
+  `);
+}
 
-export default db;
+export default pool;

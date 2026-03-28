@@ -1,67 +1,88 @@
 import express from 'express';
 import cors from 'cors';
-import db from './db.js';
+import pool, { init } from './db.js';
 
 const app = express();
-app.use(cors());
+
+const allowedOrigin = process.env.FRONTEND_URL || '*';
+app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
 // Get all items, ordered by category then name
-app.get('/api/items', (req, res) => {
-  const items = db.prepare(
-    'SELECT * FROM items ORDER BY category, name'
-  ).all();
-  res.json(items.map(item => ({ ...item, checked: !!item.checked })));
+app.get('/api/items', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM items ORDER BY category, name');
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Add a new item
-app.post('/api/items', (req, res) => {
+app.post('/api/items', async (req, res) => {
   const { name, category = 'Other', quantity = 1, unit = '' } = req.body;
   if (!name || !name.trim()) {
     return res.status(400).json({ error: 'Name is required' });
   }
-  const result = db.prepare(
-    'INSERT INTO items (name, category, quantity, unit) VALUES (?, ?, ?, ?)'
-  ).run(name.trim(), category.trim(), quantity, unit.trim());
-  const item = db.prepare('SELECT * FROM items WHERE id = ?').get(result.lastInsertRowid);
-  res.status(201).json({ ...item, checked: !!item.checked });
+  try {
+    const { rows } = await pool.query(
+      'INSERT INTO items (name, category, quantity, unit) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name.trim(), category.trim(), quantity, unit.trim()]
+    );
+    res.status(201).json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Update an item (toggle checked, edit fields)
-app.put('/api/items/:id', (req, res) => {
+app.put('/api/items/:id', async (req, res) => {
   const { id } = req.params;
-  const existing = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
-  if (!existing) return res.status(404).json({ error: 'Item not found' });
+  try {
+    const { rows: existing } = await pool.query('SELECT * FROM items WHERE id = $1', [id]);
+    if (!existing.length) return res.status(404).json({ error: 'Item not found' });
 
-  const {
-    name = existing.name,
-    category = existing.category,
-    quantity = existing.quantity,
-    unit = existing.unit,
-    checked = existing.checked,
-  } = req.body;
+    const item = existing[0];
+    const {
+      name = item.name,
+      category = item.category,
+      quantity = item.quantity,
+      unit = item.unit,
+      checked = item.checked,
+    } = req.body;
 
-  db.prepare(
-    'UPDATE items SET name=?, category=?, quantity=?, unit=?, checked=? WHERE id=?'
-  ).run(name.trim(), category.trim(), quantity, unit.trim(), checked ? 1 : 0, id);
-
-  const item = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
-  res.json({ ...item, checked: !!item.checked });
+    const { rows } = await pool.query(
+      'UPDATE items SET name=$1, category=$2, quantity=$3, unit=$4, checked=$5 WHERE id=$6 RETURNING *',
+      [name.trim(), category.trim(), quantity, unit.trim(), checked, id]
+    );
+    res.json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Delete an item
-app.delete('/api/items/:id', (req, res) => {
-  const { id } = req.params;
-  const result = db.prepare('DELETE FROM items WHERE id = ?').run(id);
-  if (result.changes === 0) return res.status(404).json({ error: 'Item not found' });
-  res.status(204).end();
+app.delete('/api/items/:id', async (req, res) => {
+  try {
+    const { rowCount } = await pool.query('DELETE FROM items WHERE id = $1', [req.params.id]);
+    if (rowCount === 0) return res.status(404).json({ error: 'Item not found' });
+    res.status(204).end();
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Delete all checked items
-app.delete('/api/items/checked/all', (req, res) => {
-  db.prepare('DELETE FROM items WHERE checked = 1').run();
-  res.status(204).end();
+app.delete('/api/items/checked/all', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM items WHERE checked = TRUE');
+    res.status(204).end();
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+init()
+  .then(() => app.listen(PORT, () => console.log(`Backend running on port ${PORT}`)))
+  .catch(err => { console.error('DB init failed', err); process.exit(1); });
