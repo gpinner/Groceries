@@ -1,0 +1,153 @@
+.lists-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 12px 16px 80px;
+  z-index: 70;
+  animation: slideUp 0.25s ease;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #cbd5e0;
+  border-radius: 2px;
+  margin: 0 auto 14px;
+}
+
+.sheet-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 14px;
+}
+
+.lists-ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  background: #f7fafc;
+  border: 1.5px solid transparent;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.list-item.active {
+  border-color: #4299e1;
+  background: #ebf8ff;
+}
+
+.list-name-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: transparent;
+  border-radius: 0;
+  text-align: left;
+}
+
+.list-check {
+  width: 18px;
+  font-size: 14px;
+  color: #4299e1;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.list-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.list-actions {
+  display: flex;
+  gap: 2px;
+  padding-right: 8px;
+}
+
+.list-icon-btn {
+  background: transparent;
+  padding: 6px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+.list-icon-btn:hover { background: #e2e8f0; }
+.list-icon-btn.delete:hover { background: #fff5f5; }
+.list-icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Inline edit/create row */
+.list-edit-row,
+.create-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+}
+
+.list-name-input {
+  flex: 1;
+  font-size: 14px;
+  padding: 7px 10px;
+  border: 1.5px solid #4299e1;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+}
+
+.list-save-btn {
+  padding: 7px 14px;
+  background: #4299e1;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.list-save-btn:hover { background: #3182ce; }
+
+.list-cancel-btn {
+  padding: 7px 10px;
+  background: #e2e8f0;
+  color: #4a5568;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.new-list-btn {
+  width: 100%;
+  padding: 12px;
+  background: #f7fafc;
+  border: 1.5px dashed #cbd5e0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4299e1;
+}
+
+.new-list-btn:hover {
+  background: #ebf8ff;
+  border-color: #4299e1;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}

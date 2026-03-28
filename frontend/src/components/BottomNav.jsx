@@ -1,19 +1,14 @@
 import './BottomNav.css';
 
-const TABS = [
-  { id: 'all',     label: 'List',    icon: '☰' },
-  { id: 'checked', label: 'Done',    icon: '✓' },
-];
-
-export default function BottomNav({ activeTab, onTabChange, onAddPress }) {
+export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsPress }) {
   return (
     <nav className="bottom-nav">
       <button
-        className={`nav-tab ${activeTab === 'all' ? 'active' : ''}`}
-        onClick={() => onTabChange('all')}
+        className={`nav-tab ${activeTab === 'lists' ? 'active' : ''}`}
+        onClick={onListsPress}
       >
-        <span className="nav-icon">{TABS[0].icon}</span>
-        <span className="nav-label">{TABS[0].label}</span>
+        <span className="nav-icon">☰</span>
+        <span className="nav-label">Lists</span>
       </button>
 
       <div className="nav-center">
@@ -23,11 +18,11 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress }) {
       </div>
 
       <button
-        className={`nav-tab ${activeTab === 'checked' ? 'active' : ''}`}
-        onClick={() => onTabChange('checked')}
+        className={`nav-tab ${activeTab === 'done' ? 'active' : ''}`}
+        onClick={() => onTabChange('done')}
       >
-        <span className="nav-icon">{TABS[1].icon}</span>
-        <span className="nav-label">{TABS[1].label}</span>
+        <span className="nav-icon">✓</span>
+        <span className="nav-label">Done</span>
       </button>
     </nav>
   );
