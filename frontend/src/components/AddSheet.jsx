@@ -14,6 +14,9 @@ export default function AddSheet({ onAdd, onCustom, onClose }) {
   const [expanded, setExpanded]       = useState(false);
   const inputRef = useRef(null);
 
+  // Focus search field as soon as the sheet mounts
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
   // Expand once — never shrink
   const expand = () => { if (!expanded) setExpanded(true); };
 
@@ -126,7 +129,7 @@ export default function AddSheet({ onAdd, onCustom, onClose }) {
               ) : (
                 <>
                   <ProductSection title="Common" items={filteredCatProducts.common}
-                    onAdd={n => onAdd(n, selectedCat)} />
+                    onAdd={n => onAdd(n, selectedCat)} asGrid />
                   <ProductSection title="All"    items={filteredCatProducts.rest}
                     onAdd={n => onAdd(n, selectedCat)} />
                 </>
@@ -172,17 +175,28 @@ function CustomQueryRow({ query, onAdd }) {
   );
 }
 
-function ProductSection({ title, items, onAdd }) {
+function ProductSection({ title, items, onAdd, asGrid = false }) {
   if (!items.length) return null;
   return (
     <div className="product-section">
       <p className="section-label">{title}</p>
-      {items.map(name => (
-        <button key={name} className="product-row" onClick={() => onAdd(name)}>
-          <span className="product-name">{name}</span>
-          <span className="product-add">+</span>
-        </button>
-      ))}
+      {asGrid ? (
+        <div className="common-grid">
+          {items.map(name => (
+            <button key={name} className="common-card" onClick={() => onAdd(name)}>
+              <span className="common-card-name">{name}</span>
+              <span className="common-card-add">+</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        items.map(name => (
+          <button key={name} className="product-row" onClick={() => onAdd(name)}>
+            <span className="product-add">+</span>
+            <span className="product-name">{name}</span>
+          </button>
+        ))
+      )}
     </div>
   );
 }

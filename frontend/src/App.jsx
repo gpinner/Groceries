@@ -117,13 +117,21 @@ export default function App() {
   };
 
   const renameList = async (id, name) => {
-    const res = await fetch(`${API}/lists/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    });
-    const updated = await res.json();
-    setLists(prev => prev.map(l => l.id === id ? updated : l));
+    // Optimistic update immediately so the user sees the change
+    setLists(prev => prev.map(l => l.id === id ? { ...l, name } : l));
+    try {
+      const res = await fetch(`${API}/lists/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error('rename failed');
+      const updated = await res.json();
+      setLists(prev => prev.map(l => l.id === id ? updated : l));
+    } catch {
+      // Revert by re-fetching the real state
+      fetch(`${API}/lists`).then(r => r.json()).then(setLists).catch(() => {});
+    }
   };
 
   const deleteList = async (id) => {
