@@ -9,9 +9,9 @@
 .item-main {
   display: flex;
   align-items: center;
-  padding: 0 16px 0 12px;
-  min-height: 64px;
-  gap: 12px;
+  padding: 0 14px 0 10px;
+  min-height: 52px;
+  gap: 10px;
 }
 
 .grocery-item.checked .item-main { opacity: 0.55; }
@@ -19,9 +19,9 @@
 /* ── Large check circle ── */
 .check-circle {
   position: relative;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
   border-radius: 50%;
   background: transparent;
   display: flex;
@@ -54,8 +54,8 @@
 
 .check-tick {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   color: #fff;
   z-index: 1;
   pointer-events: none;
@@ -94,7 +94,7 @@
 }
 
 .item-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;
   white-space: nowrap;

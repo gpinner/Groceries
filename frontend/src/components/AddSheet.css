@@ -153,7 +153,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 15px 18px;
+  padding: 11px 18px;
   background: transparent;
   border-radius: 0;
   border-bottom: 1px solid #F5F7F5;
@@ -172,7 +172,7 @@
 }
 
 .product-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   color: #1a1a1a;
 }
@@ -243,37 +243,27 @@
 /* ── Search bar — pinned at bottom ── */
 .sheet-search-bar {
   flex-shrink: 0;
-  padding: 12px 16px 20px;
-  background: #ffffff;
-  border-top: 1px solid #EEF2EE;
+  padding: 14px 16px 22px;
+  background: #27AE60;
 }
 
 .sheet-search-wrap {
   display: flex;
   align-items: center;
-  gap: 14px;
-  background: #F2F6F2;
-  border: 2px solid #E0E8E0;
-  border-radius: 20px;
-  padding: 16px 18px;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-}
-
-.sheet-search-wrap:focus-within {
-  border-color: #27AE60;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.10);
+  gap: 12px;
   background: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 .search-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  color: #8A9A88;
-  transition: color 0.15s;
+  color: #27AE60;
 }
-
-.sheet-search-wrap:focus-within .search-icon { color: #27AE60; }
 
 /* Reset all global input styles — no double border */
 .sheet-search {
@@ -281,7 +271,7 @@
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 500;
   outline: none !important;
   padding: 0 !important;
@@ -296,21 +286,21 @@
 }
 
 .sheet-search::placeholder {
-  color: #B0BAB0;
+  color: #A8B4A8;
   font-weight: 400;
 }
 
 .search-clear {
-  background: #E0E8E0;
+  background: #F0F4F0;
   color: #4A5568;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: 5px 10px;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
-.search-clear:hover { background: #CDD8CD; }
+.search-clear:hover { background: #E0E8E0; }
 
 @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
