@@ -71,6 +71,7 @@ export default function App() {
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort'
   const [customCategory, setCustomCategory] = useState('Other');
   const sortBtnRef                          = useRef(null);
+  const appRef                              = useRef(null);
   const [sortPanelTop, setSortPanelTop]     = useState(60);
 
   // Load lists once on mount
@@ -229,7 +230,7 @@ export default function App() {
   const currentList  = lists.find(l => l.id === currentListId);
 
   return (
-    <div className="app">
+    <div className="app" ref={appRef}>
       <header className="app-header">
         <div className="header-top">
           <div className="header-titles">
@@ -245,9 +246,10 @@ export default function App() {
               ref={sortBtnRef}
               className={`sort-icon-btn ${storeId ? 'store-active' : ''}`}
               onClick={() => {
-                if (sortBtnRef.current) {
-                  const rect = sortBtnRef.current.getBoundingClientRect();
-                  setSortPanelTop(Math.round(rect.bottom) + 8);
+                if (sortBtnRef.current && appRef.current) {
+                  const btnRect = sortBtnRef.current.getBoundingClientRect();
+                  const appRect = appRef.current.getBoundingClientRect();
+                  setSortPanelTop(Math.round(btnRect.bottom - appRect.top) + 8);
                 }
                 setSheet('sort');
               }}

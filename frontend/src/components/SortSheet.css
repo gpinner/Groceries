@@ -1,15 +1,15 @@
 /* Full-screen transparent click-catcher */
 .sort-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.18);
   z-index: 60;
   animation: fadeIn 0.16s ease;
 }
 
-/* Panel — drops from below the sort button, fills to bottom */
+/* Panel — drops from below the sort button, fills to bottom of app */
 .sort-panel {
-  position: fixed;
+  position: absolute;
   /* top set via inline style from measured button position */
   left: 0;
   right: 0;
