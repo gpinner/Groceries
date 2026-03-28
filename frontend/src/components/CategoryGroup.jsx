@@ -1,5 +1,5 @@
 import GroceryItem from './GroceryItem.jsx';
-import { CATEGORIES } from './CategorySheet.jsx';
+import { CATEGORIES } from '../data/categories.js';
 import './CategoryGroup.css';
 
 export default function CategoryGroup({ category, items, onToggle, onDelete, onUpdate }) {

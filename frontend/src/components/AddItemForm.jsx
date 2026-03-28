@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CATEGORIES } from './CategorySheet.jsx';
+import { CATEGORIES } from '../data/categories.js';
 import './AddItemForm.css';
 
 const UNITS = ['', 'pc', 'lb', 'oz', 'kg', 'g', 'L', 'mL', 'dozen', 'pack', 'can', 'bag', 'box'];

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CATEGORIES } from './CategorySheet.jsx';
+import { CATEGORIES } from '../data/categories.js';
 import { PRODUCTS } from '../data/products.js';
 import './ProductSheet.css';
 

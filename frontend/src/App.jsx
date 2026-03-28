@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AddItemForm from './components/AddItemForm.jsx';
-import CategorySheet from './components/CategorySheet.jsx';
-import ProductSheet from './components/ProductSheet.jsx';
+import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ListsSheet from './components/ListsSheet.jsx';
@@ -33,8 +32,8 @@ export default function App() {
   const [tab, setTab]                       = useState('all');   // 'all' | 'done'
   const [sortBy, setSortBy]                 = useState('az');
   const [showSort, setShowSort]             = useState(false);
-  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'category' | 'product' | 'add'
-  const [selectedCategory, setSelectedCategory] = useState('Other');
+  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom'
+  const [customCategory, setCustomCategory] = useState('Other');
 
   // Load lists once on mount
   useEffect(() => {
@@ -111,8 +110,7 @@ export default function App() {
     setSheet(null);
   };
 
-  // Quick-add a product by name from the product sheet
-  const quickAddProduct = async (name, category) => {
+  const quickAdd = async (name, category) => {
     await addItem({ name, category, quantity: 1, unit: '' });
   };
 
@@ -233,34 +231,26 @@ export default function App() {
         />
       )}
 
-      {sheet === 'category' && (
-        <CategorySheet
-          onSelect={cat => { setSelectedCategory(cat); setSheet('product'); }}
+      {sheet === 'add' && (
+        <AddSheet
+          onAdd={quickAdd}
+          onCustom={cat => { setCustomCategory(cat ?? 'Other'); setSheet('custom'); }}
           onClose={() => setSheet(null)}
         />
       )}
 
-      {sheet === 'product' && (
-        <ProductSheet
-          category={selectedCategory}
-          onAdd={quickAddProduct}
-          onBack={() => setSheet('category')}
-          onCustom={() => setSheet('add')}
-        />
-      )}
-
-      {sheet === 'add' && (
+      {sheet === 'custom' && (
         <AddItemForm
-          initialCategory={selectedCategory}
+          initialCategory={customCategory}
           onAdd={addItem}
-          onCancel={() => setSheet('product')}
+          onCancel={() => setSheet('add')}
         />
       )}
 
       <BottomNav
         activeTab={tab}
         onTabChange={setTab}
-        onAddPress={() => setSheet('category')}
+        onAddPress={() => setSheet('add')}
         onListsPress={() => setSheet('lists')}
       />
     </div>
