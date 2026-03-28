@@ -5,14 +5,13 @@ import './SortSheet.css';
 // Alphabetically sorted for display
 const SORTED_STORES = [...STORES].sort((a, b) => a.name.localeCompare(b.name));
 
-export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange, onClose }) {
+export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange, onClose, top = 60 }) {
   const [showStores, setShowStores] = useState(!!storeId);
   const mode = showStores ? 'store' : sortBy;
 
   const selectMode = (m) => {
     if (m === 'store') {
       setShowStores(true);
-      // stay open to let user pick a store
     } else {
       setShowStores(false);
       onStoreChange(null);
@@ -23,7 +22,6 @@ export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange
 
   const toggleStore = (id) => {
     if (storeId === id) {
-      // deselect → revert to A→Z
       onStoreChange(null);
       onSortChange('az');
     } else {
@@ -36,36 +34,36 @@ export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange
   return (
     <>
       <div className="sort-backdrop" onClick={onClose} />
-      <div className="sort-panel">
-        <h2 className="sort-panel-title">Order</h2>
-
-        {/* Three-way toggle */}
-        <div className="sort-toggle-group">
-          <button
-            className={`sort-toggle-btn ${mode === 'az' ? 'active' : ''}`}
-            onClick={() => selectMode('az')}
-          >
-            A → Z
-          </button>
-          <button
-            className={`sort-toggle-btn ${mode === 'recent' ? 'active' : ''}`}
-            onClick={() => selectMode('recent')}
-          >
-            Recent
-          </button>
-          <button
-            className={`sort-toggle-btn ${mode === 'store' ? 'active' : ''}`}
-            onClick={() => selectMode('store')}
-          >
-            Store
-          </button>
+      <div className="sort-panel" style={{ top: `${top}px` }}>
+        {/* Toggle group — fixed, does not scroll */}
+        <div className="sort-panel-header">
+          <div className="sort-toggle-group">
+            <button
+              className={`sort-toggle-btn ${mode === 'az' ? 'active' : ''}`}
+              onClick={() => selectMode('az')}
+            >
+              A → Z
+            </button>
+            <button
+              className={`sort-toggle-btn ${mode === 'recent' ? 'active' : ''}`}
+              onClick={() => selectMode('recent')}
+            >
+              Recent
+            </button>
+            <button
+              className={`sort-toggle-btn ${mode === 'store' ? 'active' : ''}`}
+              onClick={() => selectMode('store')}
+            >
+              Store
+            </button>
+          </div>
         </div>
 
-        {/* Store grid — visible when Store mode active */}
+        {/* Store list — scrollable */}
         {mode === 'store' && (
-          <div className="store-grid">
+          <div className="store-list">
             {SORTED_STORES.map(store => (
-              <StoreTile
+              <StoreRow
                 key={store.id}
                 store={store}
                 active={storeId === store.id}
@@ -79,7 +77,7 @@ export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange
   );
 }
 
-function StoreTile({ store, active, onToggle }) {
+function StoreRow({ store, active, onToggle }) {
   const [imgFailed, setImgFailed] = useState(false);
   const initials = store.name
     .split(/[\s(&]+/)
@@ -89,7 +87,14 @@ function StoreTile({ store, active, onToggle }) {
     .join('');
 
   return (
-    <button className={`store-tile ${active ? 'active' : ''}`} onClick={onToggle}>
+    <button className={`store-row ${active ? 'active' : ''}`} onClick={onToggle}>
+      <div className="store-logo-wrap">
+        {!imgFailed
+          ? <img src={store.logo} alt={store.name} className="store-logo" onError={() => setImgFailed(true)} />
+          : <span className="store-initials">{initials}</span>
+        }
+      </div>
+      <span className="store-row-name">{store.name}</span>
       {active && (
         <span className="store-check">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -97,13 +102,6 @@ function StoreTile({ store, active, onToggle }) {
           </svg>
         </span>
       )}
-      <div className="store-logo-wrap">
-        {!imgFailed
-          ? <img src={store.logo} alt={store.name} className="store-logo" onError={() => setImgFailed(true)} />
-          : <span className="store-initials">{initials}</span>
-        }
-      </div>
-      <span className="store-tile-name">{store.name}</span>
     </button>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import AddItemForm from './components/AddItemForm.jsx';
 import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
@@ -70,6 +70,8 @@ export default function App() {
   const voice = useVoiceInput();
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort'
   const [customCategory, setCustomCategory] = useState('Other');
+  const sortBtnRef                          = useRef(null);
+  const [sortPanelTop, setSortPanelTop]     = useState(60);
 
   // Load lists once on mount
   useEffect(() => {
@@ -240,8 +242,15 @@ export default function App() {
           </div>
           <div className="header-right">
             <button
+              ref={sortBtnRef}
               className={`sort-icon-btn ${storeId ? 'store-active' : ''}`}
-              onClick={() => setSheet('sort')}
+              onClick={() => {
+                if (sortBtnRef.current) {
+                  const rect = sortBtnRef.current.getBoundingClientRect();
+                  setSortPanelTop(Math.round(rect.bottom) + 8);
+                }
+                setSheet('sort');
+              }}
               aria-label="Sort / store layout"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -320,6 +329,7 @@ export default function App() {
           onSortChange={setSortBy}
           onStoreChange={setStoreId}
           onClose={() => setSheet(null)}
+          top={sortPanelTop}
         />
       )}
 

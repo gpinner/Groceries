@@ -1,50 +1,42 @@
-/* Backdrop — transparent click-catcher */
+/* Full-screen transparent click-catcher */
 .sort-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(0, 0, 0, 0.18);
   z-index: 60;
-  animation: fadeIn 0.18s ease;
+  animation: fadeIn 0.16s ease;
 }
 
-/* Panel drops from the top */
+/* Panel — drops from below the sort button, fills to bottom */
 .sort-panel {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  /* top set via inline style from measured button position */
   left: 0;
   right: 0;
+  bottom: 0;
   background: #fff;
-  border-radius: 0 0 24px 24px;
   z-index: 70;
   display: flex;
   flex-direction: column;
-  padding-bottom: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-  max-height: 80%;
-  overflow-y: auto;
-  animation: slideDown 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.10);
+  border-radius: 20px 20px 0 0;
+  animation: slideDown 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: hidden;
 }
 
-.sort-panel::-webkit-scrollbar { display: none; }
-
-.sort-panel-title {
-  font-size: 18px;
-  font-weight: var(--fw-extrabold);
-  color: #1a1a1a;
-  padding: 18px 20px 14px;
-  letter-spacing: -0.4px;
+/* ── Toggle row — never scrolls ── */
+.sort-panel-header {
   flex-shrink: 0;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #F0F2F0;
 }
 
-/* ── Three-way toggle ── */
 .sort-toggle-group {
   display: flex;
   gap: 0;
-  margin: 0 16px 20px;
   background: #F0F4F0;
   border-radius: 14px;
   padding: 4px;
-  flex-shrink: 0;
 }
 
 .sort-toggle-btn {
@@ -61,67 +53,42 @@
 .sort-toggle-btn.active {
   background: #27AE60;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.35);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.32);
 }
 
-/* ── Store 2-column grid ── */
-.store-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 16px;
+/* ── Store list — scrollable ── */
+.store-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
-.store-tile {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 10px 12px;
-  background: #F8FAF8;
-  border-radius: 16px;
-  border: 2px solid transparent;
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
-}
+.store-list::-webkit-scrollbar { display: none; }
 
-.store-tile:hover {
-  background: #EFF8F3;
-  transform: scale(1.02);
-}
-
-.store-tile.active {
-  border-color: #27AE60;
-  background: #EFF8F3;
-}
-
-/* Green checkmark badge */
-.store-check {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 20px;
-  height: 20px;
-  background: #27AE60;
-  border-radius: 50%;
+/* One store per row */
+.store-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.store-check svg {
-  width: 11px;
-  height: 11px;
-  color: #fff;
-}
-
-/* Logo container */
-.store-logo-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 20px;
+  border-bottom: 1px solid #F4F6F4;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: background 0.12s;
+}
+
+.store-row:hover  { background: #F8FAF8; }
+.store-row:active { background: #EFF8F3; }
+
+.store-row.active { background: #EFF8F3; }
+
+/* Logo circle */
+.store-logo-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #F8FAF8;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,28 +97,45 @@
 }
 
 .store-logo {
-  width: 46px;
-  height: 46px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 
-/* Initials fallback */
 .store-initials {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: var(--fw-black);
   color: #27AE60;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 }
 
-.store-tile-name {
-  font-size: 11px;
-  font-weight: var(--fw-bold);
+.store-row-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
   color: #1a1a1a;
-  text-align: center;
-  line-height: 1.3;
+  text-align: left;
 }
 
-.store-tile.active .store-tile-name { color: #27AE60; }
+.store-row.active .store-row-name { color: #27AE60; }
 
-@keyframes fadeIn   { from { opacity: 0; }             to { opacity: 1; } }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+/* Green checkmark on the right */
+.store-check {
+  width: 24px;
+  height: 24px;
+  background: #27AE60;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.store-check svg {
+  width: 13px;
+  height: 13px;
+  color: #fff;
+}
+
+@keyframes fadeIn    { from { opacity: 0; }                      to { opacity: 1; } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
