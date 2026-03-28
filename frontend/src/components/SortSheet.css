@@ -1,0 +1,144 @@
+/* Backdrop */
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.38);
+  z-index: 60;
+  animation: fadeIn 0.18s ease;
+}
+
+/* Full-width bottom sheet */
+.sort-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+  animation: slideUp 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 85%;
+  overflow-y: auto;
+}
+
+.sort-sheet::-webkit-scrollbar { display: none; }
+
+.sheet-handle {
+  width: 44px;
+  height: 4px;
+  background: #E0E8E0;
+  border-radius: 2px;
+  margin: 14px auto 0;
+  flex-shrink: 0;
+}
+
+.sort-sheet-title {
+  font-size: 20px;
+  font-weight: var(--fw-extrabold);
+  color: #1a1a1a;
+  padding: 16px 20px 12px;
+  letter-spacing: -0.4px;
+  flex-shrink: 0;
+}
+
+/* ── Three-way toggle ── */
+.sort-toggle-group {
+  display: flex;
+  gap: 0;
+  margin: 0 16px 20px;
+  background: #F0F4F0;
+  border-radius: 14px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.sort-toggle-btn {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+  color: #8A9099;
+  background: transparent;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.sort-toggle-btn.active {
+  background: #27AE60;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.35);
+}
+
+/* ── Store 2-column grid ── */
+.store-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.store-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 12px 14px;
+  background: #F8FAF8;
+  border-radius: 18px;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.store-tile:hover {
+  background: #EFF8F3;
+  transform: scale(1.02);
+}
+
+.store-tile.active {
+  border-color: #27AE60;
+  background: #EFF8F3;
+}
+
+/* Logo container — fixed size, logo scales to fit */
+.store-logo-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.store-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+/* Initials fallback */
+.store-initials {
+  font-size: 22px;
+  font-weight: var(--fw-black);
+  color: #27AE60;
+  letter-spacing: -1px;
+}
+
+.store-tile-name {
+  font-size: 12px;
+  font-weight: var(--fw-bold);
+  color: #1a1a1a;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.store-tile.active .store-tile-name { color: #27AE60; }
+
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }

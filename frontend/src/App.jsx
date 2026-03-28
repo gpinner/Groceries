@@ -4,6 +4,7 @@ import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ListsSheet from './components/ListsSheet.jsx';
+import SortSheet from './components/SortSheet.jsx';
 import VoiceModal from './components/VoiceModal.jsx';
 import { useVoiceInput } from './hooks/useVoiceInput.js';
 import { PRODUCTS } from './data/products.js';
@@ -67,8 +68,7 @@ export default function App() {
   const [sortBy, setSortBy]                 = useState('az');
   const [storeId, setStoreId]               = useState(null);
   const voice = useVoiceInput();
-  const [showSort, setShowSort]             = useState(false);
-  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom'
+  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort'
   const [customCategory, setCustomCategory] = useState('Other');
 
   // Load lists once on mount
@@ -241,7 +241,7 @@ export default function App() {
           <div className="header-right">
             <button
               className={`sort-icon-btn ${storeId ? 'store-active' : ''}`}
-              onClick={() => setShowSort(v => !v)}
+              onClick={() => setSheet('sort')}
               aria-label="Sort / store layout"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -250,33 +250,6 @@ export default function App() {
                 <line x1="9" y1="18" x2="15" y2="18" />
               </svg>
             </button>
-            {showSort && (
-              <div className="sort-dropdown">
-                <p className="dropdown-section-label">Sort items</p>
-                {SORT_OPTIONS.map(opt => (
-                  <button
-                    key={opt.id}
-                    className={`sort-option ${!storeId && sortBy === opt.id ? 'active' : ''}`}
-                    onClick={() => { setSortBy(opt.id); setStoreId(null); setShowSort(false); }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-                <p className="dropdown-section-label">Store layout</p>
-                <div className="store-select-row">
-                  <select
-                    className="store-select"
-                    value={storeId ?? ''}
-                    onChange={e => { setStoreId(e.target.value || null); setShowSort(false); }}
-                  >
-                    <option value="">— No store —</option>
-                    {STORES.map(s => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
           </div>
         </div>
         <div className="tab-row">
@@ -295,7 +268,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="scroll-area" onClick={() => setShowSort(false)}>
+      <div className="scroll-area">
         {loading && <p className="state-msg">Loading...</p>}
         {error   && <p className="state-msg error">{error}</p>}
 
@@ -339,6 +312,16 @@ export default function App() {
           </div>
         )}
       </div>
+
+      {sheet === 'sort' && (
+        <SortSheet
+          sortBy={sortBy}
+          storeId={storeId}
+          onSortChange={setSortBy}
+          onStoreChange={setStoreId}
+          onClose={() => setSheet(null)}
+        />
+      )}
 
       {sheet === 'lists' && (
         <ListsSheet
