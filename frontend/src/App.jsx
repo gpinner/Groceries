@@ -154,6 +154,16 @@ export default function App() {
     }
   };
 
+  /* Toggle checked — fire-and-forget so the item moves tabs instantly */
+  const toggleChecked = (id, checked) => {
+    setItems(prev => prev.map(i => i.id === id ? { ...i, checked } : i));
+    fetch(`${API}/items/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ checked }),
+    }).catch(() => {});
+  };
+
   const updateItem = async (id, changes) => {
     // Optimistic update
     setItems(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item));
@@ -279,7 +289,7 @@ export default function App() {
             key={category}
             category={category}
             items={catItems}
-            onToggle={(id, checked) => updateItem(id, { checked })}
+            onToggle={toggleChecked}
             onDelete={deleteItem}
             onUpdate={updateItem}
           />
@@ -287,7 +297,7 @@ export default function App() {
 
         {tab === 'done' && checkedCount > 0 && (
           <div className="done-actions">
-            <button className="restore-all-btn" onClick={() => items.filter(i => i.checked).forEach(i => updateItem(i.id, { checked: false }))}>
+            <button className="restore-all-btn" onClick={() => items.filter(i => i.checked).forEach(i => toggleChecked(i.id, false))}>
               ↩ Restore all
             </button>
             <button className="clear-all-btn" onClick={clearChecked}>
