@@ -1,11 +1,9 @@
 import { useRef } from 'react';
-import { useVoiceInput } from '../hooks/useVoiceInput.js';
 import './BottomNav.css';
 
 const LONG_PRESS_MS = 380;
 
-export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsPress, onVoiceResult }) {
-  const { listening, interim, supported, start, stop } = useVoiceInput();
+export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsPress, onVoiceStart, onVoiceStop, isListening }) {
   const timerRef    = useRef(null);
   const didVoiceRef = useRef(false);
 
@@ -16,21 +14,19 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsP
     timerRef.current = setTimeout(() => {
       timerRef.current    = null;
       didVoiceRef.current = true;
-      start();
+      onVoiceStart();
     }, LONG_PRESS_MS);
   };
 
   const handlePointerUp = () => {
     if (timerRef.current) {
-      // Released before long-press threshold → regular tap
       clearTimeout(timerRef.current);
       timerRef.current = null;
-      onAddPress();
+      if (!didVoiceRef.current) { onAddPress(); }
       return;
     }
-    if (didVoiceRef.current) {
-      const transcript = stop();
-      if (transcript) onVoiceResult(transcript);
+    if (didVoiceRef.current || isListening) {
+      onVoiceStop();
     }
   };
 
@@ -39,10 +35,7 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsP
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-    if (listening) {
-      const transcript = stop();
-      if (transcript) onVoiceResult(transcript);
-    }
+    if (isListening) onVoiceStop();
   };
 
   return (
@@ -56,27 +49,16 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsP
       </button>
 
       <div className="nav-center">
-        {/* Interim transcript bubble */}
-        {listening && (
-          <div className="voice-bubble">
-            <span className="voice-bubble-text">
-              {interim || '🎤 Listening…'}
-            </span>
-          </div>
-        )}
-
-        {/* Pulse rings while listening */}
-        {listening && <span className="pulse-ring" />}
-        {listening && <span className="pulse-ring pulse-ring-delay" />}
-
+        {isListening && <span className="pulse-ring" />}
+        {isListening && <span className="pulse-ring pulse-ring-delay" />}
         <button
-          className={`add-fab ${listening ? 'listening' : ''}`}
+          className={`add-fab ${isListening ? 'listening' : ''}`}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerLeave}
-          aria-label={supported ? 'Add item (hold for voice)' : 'Add item'}
+          aria-label="Add item (hold for voice)"
         >
-          <span className="fab-icon">{listening ? '🎤' : '+'}</span>
+          <span className="fab-icon">{isListening ? '🎤' : '+'}</span>
         </button>
       </div>
 

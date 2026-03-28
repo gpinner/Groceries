@@ -4,6 +4,8 @@ import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ListsSheet from './components/ListsSheet.jsx';
+import VoiceModal from './components/VoiceModal.jsx';
+import { useVoiceInput } from './hooks/useVoiceInput.js';
 import { PRODUCTS } from './data/products.js';
 import './App.css';
 
@@ -13,17 +15,14 @@ const VOICE_PRODUCTS = Object.entries(PRODUCTS).flatMap(([cat, { common, all }])
 );
 
 function matchVoiceToProduct(transcript) {
-  const t = transcript.toLowerCase();
-  // Exact match first
+  const t = transcript.toLowerCase().trim();
   const exact = VOICE_PRODUCTS.find(p => p.name.toLowerCase() === t);
-  if (exact) return exact;
-  // Substring match — prefer shorter names (more specific)
+  if (exact) return { ...exact, isKnown: true };
   const sub = VOICE_PRODUCTS
     .filter(p => t.includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(t))
     .sort((a, b) => a.name.length - b.name.length);
-  if (sub.length) return sub[0];
-  // No match — use transcript as-is in Other
-  return { name: transcript.charAt(0).toUpperCase() + transcript.slice(1), category: 'Other' };
+  if (sub.length) return { ...sub[0], isKnown: true };
+  return { name: transcript.charAt(0).toUpperCase() + transcript.slice(1), category: 'Other', isKnown: false };
 }
 
 const API = '/api';
@@ -49,8 +48,9 @@ export default function App() {
   const [items, setItems]                   = useState([]);
   const [loading, setLoading]               = useState(true);
   const [error, setError]                   = useState(null);
-  const [tab, setTab]                       = useState('all');   // 'all' | 'done'
+  const [tab, setTab]                       = useState('all');
   const [sortBy, setSortBy]                 = useState('az');
+  const voice = useVoiceInput();
   const [showSort, setShowSort]             = useState(false);
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom'
   const [customCategory, setCustomCategory] = useState('Other');
@@ -134,9 +134,24 @@ export default function App() {
     await addItem({ name, category, quantity: 1, unit: '' });
   };
 
-  const handleVoiceResult = async (transcript) => {
-    const { name, category } = matchVoiceToProduct(transcript);
-    await quickAdd(name, category);
+  /* ── Voice ── */
+  const handleVoiceStart = async () => {
+    await voice.start((finalChunk) => {
+      // Auto-match on each final recognition chunk
+      const result = matchVoiceToProduct(finalChunk);
+      if (result.isKnown) {
+        voice.stop();
+        quickAdd(result.name, result.category);
+      }
+    });
+  };
+
+  const handleVoiceStop = () => {
+    const transcript = voice.stop();
+    if (transcript) {
+      const { name, category } = matchVoiceToProduct(transcript);
+      quickAdd(name, category);
+    }
   };
 
   const updateItem = async (id, changes) => {
@@ -272,12 +287,22 @@ export default function App() {
         />
       )}
 
+      {voice.listening && (
+        <VoiceModal
+          transcript={voice.transcript}
+          analyserNode={voice.analyserNode}
+          onCancel={handleVoiceStop}
+        />
+      )}
+
       <BottomNav
         activeTab={tab}
         onTabChange={setTab}
         onAddPress={() => setSheet('add')}
-        onVoiceResult={handleVoiceResult}
         onListsPress={() => setSheet('lists')}
+        onVoiceStart={handleVoiceStart}
+        onVoiceStop={handleVoiceStop}
+        isListening={voice.listening}
       />
     </div>
   );
