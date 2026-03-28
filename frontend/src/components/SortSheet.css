@@ -1,45 +1,37 @@
-/* Backdrop */
-.sheet-backdrop {
+/* Backdrop — transparent click-catcher */
+.sort-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.38);
+  background: rgba(0, 0, 0, 0.22);
   z-index: 60;
   animation: fadeIn 0.18s ease;
 }
 
-/* Full-width bottom sheet */
-.sort-sheet {
+/* Panel drops from the top */
+.sort-panel {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
   background: #fff;
-  border-radius: 24px 24px 0 0;
+  border-radius: 0 0 24px 24px;
   z-index: 70;
   display: flex;
   flex-direction: column;
-  padding-bottom: 32px;
-  animation: slideUp 0.26s cubic-bezier(0.32, 0.72, 0, 1);
-  max-height: 85%;
+  padding-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  max-height: 80%;
   overflow-y: auto;
+  animation: slideDown 0.24s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.sort-sheet::-webkit-scrollbar { display: none; }
+.sort-panel::-webkit-scrollbar { display: none; }
 
-.sheet-handle {
-  width: 44px;
-  height: 4px;
-  background: #E0E8E0;
-  border-radius: 2px;
-  margin: 14px auto 0;
-  flex-shrink: 0;
-}
-
-.sort-sheet-title {
-  font-size: 20px;
+.sort-panel-title {
+  font-size: 18px;
   font-weight: var(--fw-extrabold);
   color: #1a1a1a;
-  padding: 16px 20px 12px;
+  padding: 18px 20px 14px;
   letter-spacing: -0.4px;
   flex-shrink: 0;
 }
@@ -76,18 +68,19 @@
 .store-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   padding: 0 16px;
 }
 
 .store-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 18px 12px 14px;
+  gap: 8px;
+  padding: 16px 10px 12px;
   background: #F8FAF8;
-  border-radius: 18px;
+  border-radius: 16px;
   border: 2px solid transparent;
   transition: border-color 0.15s, background 0.15s, transform 0.1s;
 }
@@ -102,11 +95,31 @@
   background: #EFF8F3;
 }
 
-/* Logo container — fixed size, logo scales to fit */
+/* Green checkmark badge */
+.store-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #27AE60;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.store-check svg {
+  width: 11px;
+  height: 11px;
+  color: #fff;
+}
+
+/* Logo container */
 .store-logo-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   background: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -117,21 +130,21 @@
 }
 
 .store-logo {
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
 }
 
 /* Initials fallback */
 .store-initials {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: var(--fw-black);
   color: #27AE60;
   letter-spacing: -1px;
 }
 
 .store-tile-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: var(--fw-bold);
   color: #1a1a1a;
   text-align: center;
@@ -140,5 +153,5 @@
 
 .store-tile.active .store-tile-name { color: #27AE60; }
 
-@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fadeIn   { from { opacity: 0; }             to { opacity: 1; } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
