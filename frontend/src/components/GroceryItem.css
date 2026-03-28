@@ -1,46 +1,89 @@
 .grocery-item {
   display: flex;
   align-items: center;
-  padding: 14px 18px;
+  padding: 10px 16px 10px 14px;
   gap: 14px;
-  border-bottom: 1px solid #F5F7F5;
+  border-bottom: 1px solid #F2F5F2;
   background: #fff;
   transition: background 0.1s;
+  min-height: 72px;
 }
 
 .grocery-item:last-child { border-bottom: none; }
 .grocery-item:hover      { background: #FAFCFA; }
+.grocery-item.checked    { background: #FAFCFA; }
 
-.grocery-item.checked { background: #FAFCFA; }
-.grocery-item.checked .item-name {
-  text-decoration: line-through;
-  color: #B0B8B0;
-}
-
-/* Checkbox */
-.check-btn {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
+/* ── Large check circle ── */
+.check-circle {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   border-radius: 50%;
-  border: 2.5px solid #D8E8D8 !important;
-  background: #fff;
-  font-size: 14px;
-  color: #fff;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+  padding: 0;
 }
 
-.check-btn:hover { transform: scale(1.12); border-color: #27AE60 !important; }
+.check-circle:hover { transform: scale(1.08); }
+.check-circle:active { transform: scale(0.94) !important; }
 
-.grocery-item.checked .check-btn {
+/* The visible ring */
+.check-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2.5px solid #D8E8D8;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.check-circle:hover .check-ring {
+  border-color: #27AE60;
+  background: #F0FAF4;
+}
+
+/* Checked state — filled green */
+.grocery-item.checked .check-ring {
   background: #27AE60;
-  border-color: #27AE60 !important;
+  border-color: #27AE60;
 }
 
-/* Item info */
+/* SVG checkmark */
+.check-tick {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  z-index: 1;
+}
+
+/* Restore hint — shows on hover over a checked item */
+.restore-hint {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  z-index: 2;
+  transition: opacity 0.15s;
+}
+
+.grocery-item.checked .check-circle:hover .restore-hint {
+  opacity: 1;
+}
+
+/* ── Item info ── */
 .item-info {
   flex: 1;
   display: flex;
@@ -50,77 +93,109 @@
 }
 
 .item-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   color: #1a1a1a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+
+.grocery-item.checked .item-name {
+  text-decoration: line-through;
+  color: #C0C8C0;
 }
 
 .item-qty {
   font-size: 12px;
   font-weight: 500;
-  color: #8A9099;
+  color: #B0B8B0;
 }
 
-/* Actions */
-.item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+/* ── Action buttons ── */
+.item-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.grocery-item:hover .item-actions { opacity: 1; }
 
 .edit-btn, .delete-btn {
   background: transparent;
   border-radius: 10px;
-  padding: 6px 8px;
-  font-size: 16px;
-  color: #8A9099;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.edit-btn:hover   { background: #E8F8EE; color: #27AE60; }
-.delete-btn:hover { background: #FEF0EE; color: #E74C3C; }
+.edit-btn svg, .delete-btn svg {
+  width: 16px;
+  height: 16px;
+  color: #B0B8B0;
+  transition: color 0.12s;
+}
 
-/* Edit mode */
+.edit-btn:hover { background: #E8F8EE; }
+.edit-btn:hover svg { color: #27AE60; }
+
+.delete-btn:hover { background: #FEF0EE; }
+.delete-btn:hover svg { color: #E74C3C; }
+
+/* ── Edit mode ── */
 .grocery-item.editing {
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
   padding: 16px 18px;
   background: #FAFCFA;
+  min-height: unset;
 }
 
 .edit-name {
   width: 100%;
-  font-size: 15px;
+  font-size: 16px;
   padding: 12px 14px;
-  border: 1.5px solid #D8E8D8;
+  border: 2px solid #E0E8E0;
   border-radius: 12px;
+  font-weight: 500;
 }
 
-.edit-row { display: flex; gap: 8px; }
+.edit-name:focus { border-color: #27AE60; }
+
+.edit-row {
+  display: flex;
+  gap: 8px;
+}
 
 .edit-qty {
   width: 80px;
   padding: 10px 12px;
-  border: 1.5px solid #D8E8D8;
+  border: 2px solid #E0E8E0;
   border-radius: 12px;
+  text-align: center;
 }
 
 .edit-actions { display: flex; gap: 8px; }
 
 .save-btn {
   flex: 1;
-  padding: 12px;
+  padding: 13px;
   background: #27AE60;
   color: #fff;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   border-radius: 12px;
-  letter-spacing: 0.2px;
 }
 
 .save-btn:not(:disabled):hover { background: #1E9B54; }
 
 .cancel-btn {
-  padding: 12px 18px;
+  padding: 13px 18px;
   background: #F0F4F0;
   color: #4A5568;
   font-size: 14px;

@@ -1,40 +1,37 @@
-.category-group {
+/* Category divider — subtle, in the background */
+.category-divider {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 18px 20px 8px;
+}
+
+.divider-emoji {
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.divider-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #B0B8B0;
+  white-space: nowrap;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: #E8EDE8;
+}
+
+/* Item list — no card wrapper */
+.item-list {
+  list-style: none;
   background: #fff;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
-
-.category-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  background: #ffffff;
-  border-bottom: 1px solid #F2F5F2;
-}
-
-.category-emoji {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.category-title {
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #1a1a1a;
-  flex: 1;
-}
-
-.category-count {
-  font-size: 12px;
-  font-weight: 700;
-  color: #27AE60;
-  background: #E8F8EE;
-  padding: 3px 10px;
-  border-radius: 20px;
-}
-
-.item-list { list-style: none; }

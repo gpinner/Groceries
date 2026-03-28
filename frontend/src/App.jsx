@@ -250,9 +250,21 @@ export default function App() {
         {error   && <p className="state-msg error">{error}</p>}
 
         {!loading && !error && sortedCategories.length === 0 && (
-          <p className="state-msg">
-            {tab === 'all' ? 'Tap + to add your first item.' : 'Nothing done yet.'}
-          </p>
+          <div className="state-msg">
+            {tab === 'all' ? (
+              <>
+                <span style={{fontSize:40}}>🛒</span>
+                <span style={{marginTop:8,display:'block'}}>Your list is empty</span>
+                <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Tap + to add items</span>
+              </>
+            ) : (
+              <>
+                <span style={{fontSize:40}}>✅</span>
+                <span style={{marginTop:8,display:'block'}}>Nothing here yet</span>
+                <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Check items off your list</span>
+              </>
+            )}
+          </div>
         )}
 
         {sortedCategories.map(([category, catItems]) => (
@@ -267,9 +279,14 @@ export default function App() {
         ))}
 
         {tab === 'done' && checkedCount > 0 && (
-          <button className="clear-all-btn" onClick={clearChecked}>
-            🗑️ Clear all done items
-          </button>
+          <div className="done-actions">
+            <button className="restore-all-btn" onClick={() => items.filter(i => i.checked).forEach(i => updateItem(i.id, { checked: false }))}>
+              ↩ Restore all
+            </button>
+            <button className="clear-all-btn" onClick={clearChecked}>
+              🗑️ Clear all
+            </button>
+          </div>
         )}
       </div>
 

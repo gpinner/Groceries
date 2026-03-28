@@ -119,10 +119,10 @@
 .scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 16px 100px;
+  padding: 4px 16px 100px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -139,16 +139,35 @@
 
 .state-msg.error { color: #E74C3C; }
 
-/* ── Clear done button ── */
+/* ── Done tab action row ── */
+.done-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 0 4px;
+}
+
+.restore-all-btn {
+  flex: 1;
+  padding: 14px;
+  background: #E8F8EE;
+  color: #27AE60;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 14px;
+  border: 1.5px solid #C8EDD8 !important;
+  letter-spacing: 0.2px;
+}
+
+.restore-all-btn:hover { background: #D4F0E0; }
+
 .clear-all-btn {
-  margin: 4px auto 0;
-  padding: 14px 28px;
+  flex: 1;
+  padding: 14px;
   background: #FEF0EE;
   color: #E74C3C;
   font-size: 14px;
   font-weight: 700;
   border-radius: 14px;
-  display: block;
   border: 1.5px solid #FADADD !important;
   letter-spacing: 0.2px;
 }
