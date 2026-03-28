@@ -9,6 +9,7 @@ export default function BottomNav({ activeTab, onTabChange, onAddPress, onListsP
 
   const handlePointerDown = (e) => {
     e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
     didVoiceRef.current = false;
 
     timerRef.current = setTimeout(() => {

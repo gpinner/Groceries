@@ -20,63 +20,66 @@ export function useVoiceInput() {
 
     onAutoMatchRef.current = onAutoMatch ?? null;
 
+    // Set listening immediately so the modal appears without waiting for getUserMedia
+    listeningRef.current  = true;
+    transcriptRef.current = '';
+    setListening(true);
+    setTranscript('');
+
+    // Start speech recognition synchronously
+    const rec = new SR();
+    rec.continuous      = true;
+    rec.interimResults  = true;
+    rec.lang            = 'en-US';
+    rec.maxAlternatives = 1;
+
+    rec.onresult = (e) => {
+      let interim = '';
+      let final   = '';
+      for (const result of Array.from(e.results)) {
+        if (result.isFinal) final   += result[0].transcript + ' ';
+        else                interim += result[0].transcript;
+      }
+      const full = (final + interim).trim();
+      transcriptRef.current = full;
+      setTranscript(full);
+
+      if (final.trim() && onAutoMatchRef.current) {
+        onAutoMatchRef.current(final.trim());
+      }
+    };
+
+    rec.onerror = (e) => { if (e.error !== 'aborted') console.warn('SR error:', e.error); };
+
+    rec.onend = () => {
+      if (listeningRef.current && recRef.current === rec) {
+        try { rec.start(); } catch (_) {}
+      }
+    };
+
+    rec.start();
+    recRef.current = rec;
+
+    // Set up waveform asynchronously — modal already visible with idle animation
     try {
-      // Microphone stream for the waveform
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!listeningRef.current) {
+        stream.getTracks().forEach(t => t.stop());
+        return true;
+      }
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 128;
       audioCtx.createMediaStreamSource(stream).connect(analyser);
-
-      streamRef.current  = stream;
+      streamRef.current   = stream;
       audioCtxRef.current = audioCtx;
       setAnalyserNode(analyser);
-
-      // Speech recognition
-      const rec = new SR();
-      rec.continuous      = true;
-      rec.interimResults  = true;
-      rec.lang            = 'en-US';
-      rec.maxAlternatives = 1;
-
-      rec.onresult = (e) => {
-        let interim = '';
-        let final   = '';
-        for (const result of Array.from(e.results)) {
-          if (result.isFinal) final   += result[0].transcript + ' ';
-          else                interim += result[0].transcript;
-        }
-        const full = (final + interim).trim();
-        transcriptRef.current = full;
-        setTranscript(full);
-
-        // Attempt auto-match on final chunks
-        if (final.trim() && onAutoMatchRef.current) {
-          onAutoMatchRef.current(final.trim());
-        }
-      };
-
-      rec.onerror = (e) => { if (e.error !== 'aborted') console.warn('SR error:', e.error); };
-
-      // Auto-restart if browser cuts off mid-session
-      rec.onend = () => {
-        if (listeningRef.current && recRef.current === rec) {
-          try { rec.start(); } catch (_) {}
-        }
-      };
-
-      rec.start();
-      recRef.current     = rec;
-      listeningRef.current = true;
-      transcriptRef.current = '';
-      setListening(true);
-      setTranscript('');
-
-      return true;
     } catch (err) {
-      console.error('Voice start error:', err);
-      return false;
+      console.warn('Waveform setup failed (mic denied?):', err);
+      // Voice recognition still works, just no waveform
     }
+
+    return true;
   };
 
   const stop = () => {
