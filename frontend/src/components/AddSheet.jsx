@@ -95,27 +95,19 @@ export default function AddSheet({ onAdd, onCustom, onClose }) {
           {/* Global search results */}
           {showGlobalSearch && (
             <div className="product-list">
-              {globalResults.length === 0 ? (
-                <div className="no-results">
-                  <p>No products found</p>
-                  <button className="custom-link-center" onClick={() => onCustom(null)}>
-                    Add "{query}" as custom item
-                  </button>
-                </div>
-              ) : (
-                globalResults.map(({ name, category }) => (
-                  <button key={`${category}-${name}`} className="product-row"
-                    onClick={() => onAdd(name, category)}>
-                    <div className="product-row-info">
-                      <span className="product-name">{name}</span>
-                      <span className="product-cat-badge">
-                        {CATEGORIES.find(c => c.name === category)?.emoji} {category}
-                      </span>
-                    </div>
-                    <span className="product-add">+</span>
-                  </button>
-                ))
-              )}
+              {globalResults.map(({ name, category }) => (
+                <button key={`${category}-${name}`} className="product-row"
+                  onClick={() => onAdd(name, category)}>
+                  <div className="product-row-info">
+                    <span className="product-name">{name}</span>
+                    <span className="product-cat-badge">
+                      {CATEGORIES.find(c => c.name === category)?.emoji} {category}
+                    </span>
+                  </div>
+                  <span className="product-add">+</span>
+                </button>
+              ))}
+              <CustomQueryRow query={query} onAdd={name => onAdd(name, 'Other')} />
             </div>
           )}
 
@@ -123,17 +115,11 @@ export default function AddSheet({ onAdd, onCustom, onClose }) {
           {showCategoryView && (
             <div className="product-list">
               {query.trim() ? (
-                filteredCatProducts.common.length === 0 ? (
-                  <div className="no-results">
-                    <p>No products found</p>
-                    <button className="custom-link-center" onClick={() => onCustom(selectedCat)}>
-                      Add "{query}" as custom item
-                    </button>
-                  </div>
-                ) : (
+                <>
                   <ProductSection title="Results" items={filteredCatProducts.common}
                     onAdd={n => onAdd(n, selectedCat)} />
-                )
+                  <CustomQueryRow query={query} onAdd={n => onAdd(n, selectedCat)} />
+                </>
               ) : (
                 <>
                   <ProductSection title="Common" items={filteredCatProducts.common}
@@ -165,6 +151,19 @@ export default function AddSheet({ onAdd, onCustom, onClose }) {
         </div>
       </div>
     </>
+  );
+}
+
+function CustomQueryRow({ query, onAdd }) {
+  if (!query.trim()) return null;
+  return (
+    <button className="product-row custom-query-row" onClick={() => onAdd(query.trim())}>
+      <div className="product-row-info">
+        <span className="product-name">{query.trim()}</span>
+        <span className="product-cat-badge custom-hint">Tap to add this item</span>
+      </div>
+      <span className="product-add">+</span>
+    </button>
   );
 }
 
