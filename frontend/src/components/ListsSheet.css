@@ -24,7 +24,7 @@
 
 .sheet-title {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: var(--fw-extrabold);
   color: #1a1a1a;
   padding: 16px 20px 12px;
   letter-spacing: -0.4px;
@@ -69,13 +69,13 @@
   width: 20px;
   font-size: 16px;
   color: #27AE60;
-  font-weight: 800;
+  font-weight: var(--fw-extrabold);
   flex-shrink: 0;
 }
 
 .list-name {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   color: #1a1a1a;
 }
 
@@ -115,7 +115,7 @@
   border-radius: 12px;
   outline: none;
   background: #fff;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .list-save-btn {
@@ -123,7 +123,7 @@
   background: #27AE60;
   color: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   border-radius: 12px;
 }
 
@@ -134,7 +134,7 @@
   background: #F0F4F0;
   color: #4A5568;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   border-radius: 12px;
 }
 
@@ -148,7 +148,7 @@
   border: 2px dashed #D8E8D8 !important;
   border-radius: 16px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   color: #27AE60;
   transition: background 0.15s, border-color 0.15s;
 }

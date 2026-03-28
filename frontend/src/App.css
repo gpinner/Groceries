@@ -26,7 +26,7 @@
 
 .header-titles h1 {
   font-size: 26px;
-  font-weight: 800;
+  font-weight: var(--fw-extrabold);
   color: #1a1a1a;
   max-width: 240px;
   white-space: nowrap;
@@ -38,7 +38,7 @@
 .subtitle {
   margin-top: 4px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   color: #8A9099;
 }
 
@@ -54,7 +54,7 @@
   padding: 10px 0;
   border-radius: 12px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   background: #F0F4F0;
   color: #8A9099;
   transition: background 0.15s, color 0.15s;
@@ -106,7 +106,7 @@
   padding: 13px 18px;
   text-align: left;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   color: #4A5568;
   background: transparent;
   border-radius: 0;
@@ -137,7 +137,7 @@
   color: #8A9099;
   padding: 60px 0 20px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .state-msg.error { color: #E74C3C; }
@@ -155,7 +155,7 @@
   background: #E8F8EE;
   color: #27AE60;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   border-radius: 14px;
   border: 1.5px solid #C8EDD8 !important;
   letter-spacing: 0.2px;
@@ -169,7 +169,7 @@
   background: #FEF0EE;
   color: #E74C3C;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   border-radius: 14px;
   border: 1.5px solid #FADADD !important;
   letter-spacing: 0.2px;

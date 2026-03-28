@@ -43,7 +43,7 @@
 
 .voice-label {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--fw-extrabold);
   color: #27AE60;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -67,7 +67,7 @@
 
 .transcript-text {
   font-size: 22px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   color: #F8F9FA;
   line-height: 1.3;
   letter-spacing: -0.3px;
@@ -76,7 +76,7 @@
 .transcript-hint {
   font-size: 15px;
   color: #6C757D;
-  font-weight: 400;
+  font-weight: var(--fw-regular);
 }
 
 /* Cancel */
@@ -86,7 +86,7 @@
   background: rgba(255, 255, 255, 0.08);
   color: #8A9099;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   border-radius: 50px;
   border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
   transition: background 0.15s, color 0.15s;

@@ -31,7 +31,7 @@
 
 .add-category-label {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: var(--fw-extrabold);
   color: #1a1a1a;
   display: flex;
   align-items: center;
@@ -50,7 +50,7 @@
   padding: 14px 16px;
   border: 2px solid #E0E8E0;
   border-radius: 14px;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .name-input:focus {
@@ -97,7 +97,7 @@
   background: #27AE60;
   color: #fff;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   border-radius: 14px;
   letter-spacing: 0.2px;
 }
@@ -109,7 +109,7 @@
   background: #F0F4F0;
   color: #4A5568;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   border-radius: 14px;
 }
 
@@ -118,7 +118,7 @@
 .form-error {
   font-size: 13px;
   color: #E74C3C;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 @keyframes fadeIn {

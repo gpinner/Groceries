@@ -95,7 +95,7 @@
 
 .item-name {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   color: #1a1a1a;
   white-space: nowrap;
   overflow: hidden;
@@ -118,7 +118,7 @@
 
 .item-qty {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   color: #A0A8A0;
   white-space: nowrap;
   flex-shrink: 0;
@@ -207,7 +207,7 @@
   min-width: 48px;
   text-align: center;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   color: #1a1a1a;
   padding: 0 4px;
   border-left: 1px solid #E8EEE8;
@@ -228,7 +228,7 @@
   padding: 8px 12px;
   border-radius: 10px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   background: transparent;
 }
 
@@ -264,7 +264,7 @@
   border-radius: 14px;
   margin: 14px 16px 0;
   width: calc(100% - 32px);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .edit-name:focus { border-color: #27AE60; box-shadow: 0 0 0 3px rgba(39,174,96,0.1); }
@@ -280,7 +280,7 @@
   padding: 13px;
   background: #27AE60;
   color: #fff;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   font-size: 15px;
   border-radius: 12px;
 }
@@ -292,7 +292,7 @@
   background: #F0F4F0;
   color: #4A5568;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   border-radius: 12px;
 }
 

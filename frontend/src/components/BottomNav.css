@@ -46,7 +46,7 @@
 
 .nav-label {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.3px;
 }
 
