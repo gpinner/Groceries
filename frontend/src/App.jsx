@@ -7,12 +7,28 @@ import './App.css';
 
 const API = '/api';
 
+const SORT_OPTIONS = [
+  { id: 'az',     label: 'A → Z' },
+  { id: 'za',     label: 'Z → A' },
+  { id: 'recent', label: 'Recent' },
+];
+
+function sortItems(items, sortBy) {
+  return [...items].sort((a, b) => {
+    if (sortBy === 'az')     return a.name.localeCompare(b.name);
+    if (sortBy === 'za')     return b.name.localeCompare(a.name);
+    if (sortBy === 'recent') return b.created_at - a.created_at;
+    return 0;
+  });
+}
+
 export default function App() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [tab, setTab] = useState('all');           // 'all' | 'checked'
-  const [sheet, setSheet] = useState(null);        // null | 'category' | 'add'
+  const [items, setItems]                   = useState([]);
+  const [loading, setLoading]               = useState(true);
+  const [error, setError]                   = useState(null);
+  const [tab, setTab]                       = useState('all');      // 'all' | 'checked'
+  const [sortBy, setSortBy]                 = useState('az');
+  const [sheet, setSheet]                   = useState(null);       // null | 'category' | 'add'
   const [selectedCategory, setSelectedCategory] = useState('Other');
 
   const fetchItems = useCallback(async () => {
@@ -38,9 +54,7 @@ export default function App() {
     });
     if (!res.ok) throw new Error('Failed to add item');
     const item = await res.json();
-    setItems(prev => [...prev, item].sort((a, b) =>
-      a.category.localeCompare(b.category) || a.name.localeCompare(b.name)
-    ));
+    setItems(prev => [...prev, item]);
     setSheet(null);
   };
 
@@ -72,6 +86,7 @@ export default function App() {
     setSheet('add');
   };
 
+  // Filter by tab, group by category, sort items within each group
   const filtered = tab === 'checked'
     ? items.filter(i => i.checked)
     : items.filter(i => !i.checked);
@@ -82,31 +97,51 @@ export default function App() {
     return acc;
   }, {});
 
+  const sortedCategories = Object.entries(grouped)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([category, catItems]) => [category, sortItems(catItems, sortBy)]);
+
   const checkedCount = items.filter(i => i.checked).length;
   const pendingCount = items.filter(i => !i.checked).length;
 
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Grocery List</h1>
-        <p className="subtitle">
-          {pendingCount === 0 && checkedCount === 0
-            ? 'Your list is empty'
-            : `${pendingCount} to buy · ${checkedCount} done`}
-        </p>
+        <div className="header-top">
+          <div>
+            <h1>Grocery List</h1>
+            <p className="subtitle">
+              {pendingCount === 0 && checkedCount === 0
+                ? 'Your list is empty'
+                : `${pendingCount} to buy · ${checkedCount} done`}
+            </p>
+          </div>
+        </div>
+        <div className="sort-bar">
+          <span className="sort-label">Sort:</span>
+          {SORT_OPTIONS.map(opt => (
+            <button
+              key={opt.id}
+              className={`sort-btn ${sortBy === opt.id ? 'active' : ''}`}
+              onClick={() => setSortBy(opt.id)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </header>
 
       <div className="scroll-area">
         {loading && <p className="state-msg">Loading...</p>}
         {error && <p className="state-msg error">{error}</p>}
 
-        {!loading && !error && Object.keys(grouped).length === 0 && (
+        {!loading && !error && sortedCategories.length === 0 && (
           <p className="state-msg">
             {tab === 'all' ? 'Tap + to add your first item.' : 'Nothing done yet.'}
           </p>
         )}
 
-        {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, catItems]) => (
+        {sortedCategories.map(([category, catItems]) => (
           <CategoryGroup
             key={category}
             category={category}
@@ -119,7 +154,7 @@ export default function App() {
 
         {tab === 'checked' && checkedCount > 0 && (
           <button className="clear-all-btn" onClick={clearChecked}>
-            Clear all done items
+            🗑️ Clear all done items
           </button>
         )}
       </div>

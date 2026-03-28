@@ -1,9 +1,9 @@
 .grocery-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 14px;
+  gap: 10px;
   border-bottom: 1px solid #f0f4f8;
-  gap: 12px;
   transition: background 0.1s;
 }
 
@@ -11,8 +11,9 @@
   border-bottom: none;
 }
 
-.grocery-item:hover {
-  background: #f7fafc;
+/* Checked state */
+.grocery-item.checked {
+  background: #f9fafb;
 }
 
 .grocery-item.checked .item-name {
@@ -20,17 +21,20 @@
   color: #a0aec0;
 }
 
+/* Checkbox */
 .check-btn {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
   border-radius: 50%;
   border: 2px solid #cbd5e0 !important;
   background: #fff;
+  font-size: 13px;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition: border-color 0.15s, background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .grocery-item.checked .check-btn {
@@ -38,22 +42,18 @@
   border-color: #48bb78 !important;
 }
 
-.checkmark {
-  font-size: 13px;
-  color: #fff;
-  line-height: 1;
-}
-
+/* Item info */
 .item-info {
   flex: 1;
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .item-name {
   font-size: 15px;
+  font-weight: 500;
   color: #2d3748;
   white-space: nowrap;
   overflow: hidden;
@@ -61,48 +61,39 @@
 }
 
 .item-qty {
-  font-size: 13px;
+  font-size: 12px;
   color: #718096;
-  white-space: nowrap;
 }
 
+/* Action buttons — always visible on mobile */
 .item-actions {
   display: flex;
-  gap: 4px;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.grocery-item:hover .item-actions {
-  opacity: 1;
+  gap: 2px;
+  flex-shrink: 0;
 }
 
 .edit-btn, .delete-btn {
   background: transparent;
+  border-radius: 8px;
   padding: 4px 6px;
-  font-size: 13px;
-  border-radius: 4px;
+  font-size: 15px;
 }
 
-.edit-btn:hover {
-  background: #e2e8f0;
-}
+.edit-btn:hover  { background: #edf2f7; }
+.delete-btn:hover { background: #fff5f5; }
 
-.delete-btn {
-  color: #e53e3e;
-}
-
-.delete-btn:hover {
-  background: #fed7d7;
-}
-
-/* Editing state */
+/* Edit mode */
 .grocery-item.editing {
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
-  padding: 12px 16px;
+  padding: 12px 14px;
   background: #f7fafc;
+}
+
+.edit-name {
+  width: 100%;
+  font-size: 15px;
 }
 
 .edit-row {
@@ -110,16 +101,8 @@
   gap: 8px;
 }
 
-.edit-row.secondary {
-  flex-wrap: wrap;
-}
-
-.edit-name {
-  flex: 1;
-}
-
 .edit-qty {
-  width: 72px;
+  width: 70px;
 }
 
 .edit-actions {
@@ -128,22 +111,23 @@
 }
 
 .save-btn {
-  padding: 6px 16px;
+  flex: 1;
+  padding: 8px;
   background: #4299e1;
   color: #fff;
   font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
 }
 
-.save-btn:not(:disabled):hover {
-  background: #3182ce;
-}
+.save-btn:not(:disabled):hover { background: #3182ce; }
 
 .cancel-btn {
-  padding: 6px 16px;
+  padding: 8px 14px;
   background: #e2e8f0;
   color: #4a5568;
+  font-size: 14px;
+  border-radius: 8px;
 }
 
-.cancel-btn:hover {
-  background: #cbd5e0;
-}
+.cancel-btn:hover { background: #cbd5e0; }
