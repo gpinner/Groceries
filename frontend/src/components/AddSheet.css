@@ -149,7 +149,18 @@
   padding: 4px 14px 10px;
 }
 
-/* Same height as .tab-btn (~40px: 10px v-padding + 13px text × line-height) */
+/* ── Recommendation slot animations ── */
+@keyframes recFadeOut {
+  from { opacity: 0.5; }
+  to   { opacity: 0; }
+}
+
+@keyframes recFadeIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Same height as .tab-btn (~40px) */
 .recent-chip {
   display: flex;
   flex-direction: row;
@@ -166,11 +177,26 @@
   overflow: hidden;
 }
 
-.recent-chip.chip-added { background: #E8F8EE; border-color: #27AE60; }
+/* Phase: checking — ✓ green flash */
+.recent-chip.phase-checking {
+  background: #E8F8EE;
+  border-color: #27AE60;
+  pointer-events: none;
+}
+.recent-chip.phase-checking .recent-chip-emoji { color: #27AE60; }
+
+/* Phase: fading — 50% → 0 over 3s */
+.recent-chip.phase-fading {
+  pointer-events: none;
+  animation: recFadeOut 3s linear forwards;
+}
+
+/* Phase: incoming — fade + subtle scale in over 0.5s */
+.recent-chip.phase-incoming {
+  animation: recFadeIn 0.5s ease-out forwards;
+}
 
 .recent-chip-emoji { font-size: 18px; line-height: 1; flex-shrink: 0; }
-
-.recent-chip.chip-added .recent-chip-emoji { color: #27AE60; }
 
 .recent-chip-name {
   font-size: 13px;

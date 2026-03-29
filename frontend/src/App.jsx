@@ -273,12 +273,14 @@ export default function App() {
     });
   };
 
-  // Quick-add: if same product already exists unchecked, increment its qty instead
+  // Quick-add: if same product already exists unchecked, increment its qty instead.
+  // trackProduct is called immediately (before any await) so recommendations update
+  // synchronously in the same render cycle — fixes the "item stays visible" bug.
   const quickAdd = async (name, category) => {
+    trackProduct(name, category); // ← must be first, before any await
     const existing = items.find(i => i.name === name && !i.checked);
     if (existing) {
       await updateItem(existing.id, { quantity: (Number(existing.quantity) || 1) + 1 });
-      trackProduct(name, category);
       return;
     }
     const res = await fetch(`${API}/items`, {
@@ -289,7 +291,6 @@ export default function App() {
     if (!res.ok) return;
     const item = await res.json();
     setItems(prev => [...prev, item]);
-    trackProduct(name, category);
   };
 
   /* ── Voice ── */

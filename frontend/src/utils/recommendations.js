@@ -18,7 +18,7 @@
 export const SESSION_START = Date.now();
 
 const POOL_SIZE    = 30;
-const VISIBLE_SIZE = 10;
+const VISIBLE_SIZE = 8;
 const MIN_DAYS     = 3; // suppress anything added more recently than this
 
 /**

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { CATEGORIES } from '../data/categories.js';
 import { PRODUCTS }   from '../data/products.js';
 import './AddSheet.css';
@@ -68,23 +68,81 @@ export function productEmoji(name, category) {
   return '🏷️';
 }
 
-function RecentChip({ name, category, done, onAdd }) {
+// Phases: visible → checking (✓ shown) → fading (fade to 0 over 3s) → replaced by incoming
+function RecSlot({ name, category, phase, onAdd }) {
+  const interactive = phase === 'visible' || phase === 'incoming';
   return (
     <button
-      className={`recent-chip${done ? ' chip-added' : ''}`}
-      onClick={() => onAdd(name, category)}
+      className={`recent-chip phase-${phase}`}
+      onClick={interactive ? () => onAdd(name, category) : undefined}
+      disabled={!interactive}
     >
-      <span className="recent-chip-emoji">{done ? '✓' : productEmoji(name, category)}</span>
+      <span className="recent-chip-emoji">
+        {phase === 'checking' ? '✓' : productEmoji(name, category)}
+      </span>
       <span className="recent-chip-name">{name}</span>
     </button>
   );
 }
+
+const VISIBLE_RECS = 8;
 
 export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recommendations = [] }) {
   const [query, setQuery]             = useState('');
   const [selectedCat, setSelectedCat] = useState(null);
   const [addedSet, setAddedSet]       = useState(new Set());
   const inputRef = useRef(null);
+
+  // ── Recommendation slots ─────────────────────────────────────────────────
+  // Stable list of 8 positions. Each slot has { name, category, phase }.
+  // Phases: 'visible' → 'checking' → 'fading' → replaced with 'incoming' → 'visible'
+  const [slots, setSlots] = useState(() =>
+    recommendations.slice(0, VISIBLE_RECS).map(r => ({
+      name: r.name, category: r.category, phase: 'visible',
+    }))
+  );
+  // Always-fresh ref so setTimeout callbacks never use stale recommendations
+  const recRef = useRef(recommendations);
+  useEffect(() => { recRef.current = recommendations; }, [recommendations]);
+
+  const handleRecAdd = useCallback((name, category) => {
+    onQuickAdd(name, category); // trackProduct called immediately inside quickAdd
+
+    // 1. Show ✓ checkmark
+    setSlots(prev => prev.map(s => s.name === name ? { ...s, phase: 'checking' } : s));
+
+    // 2. After 900ms: start 3s fade-out (50% → 0)
+    setTimeout(() => {
+      setSlots(prev => prev.map(s => s.name === name ? { ...s, phase: 'fading' } : s));
+    }, 900);
+
+    // 3. After fade completes: replace slot with next recommendation
+    setTimeout(() => {
+      setSlots(prev => {
+        // Names of slots still active (not the one we're replacing)
+        const activeNames = new Set(
+          prev.filter(s => s.name !== name).map(s => s.name)
+        );
+        // Pick first rec not already visible in another slot
+        const next = recRef.current.find(r => !activeNames.has(r.name));
+        const updated = prev.map(s => {
+          if (s.name !== name) return s;
+          return next
+            ? { name: next.name, category: next.category, phase: 'incoming' }
+            : null;
+        }).filter(Boolean);
+        return updated;
+      });
+
+      // 4. After fade-in completes: mark slot as visible
+      setTimeout(() => {
+        setSlots(prev => prev.map(s =>
+          s.phase === 'incoming' ? { ...s, phase: 'visible' } : s
+        ));
+      }, 550);
+    }, 900 + 3000);
+  }, [onQuickAdd]);
+  // ─────────────────────────────────────────────────────────────────────────
 
   // Focus search input when panel opens
   useEffect(() => {
@@ -136,8 +194,7 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
   const showSearch  = !selectedCat && query.trim().length > 0;
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
-  // Recommendations are pre-sorted by score — show up to 10
-  const showRec = recommendations.length > 0 && !query.trim() && !selectedCat;
+  const showRec     = slots.length > 0 && !query.trim() && !selectedCat;
 
   return (
     <div className={`add-panel${closing ? ' closing' : ''}`}>
@@ -188,18 +245,18 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
       {/* ── Scrollable content area ── */}
       <div className="add-panel-body">
 
-        {/* Recommended products — scored by personal history + popular defaults */}
+        {/* Recommended — stable slot grid with per-slot phase animations */}
         {showRec && (
           <div className="recent-outer">
             <p className="sheet-section-label">Recommended</p>
             <div className="recent-grid">
-              {recommendations.map(({ name, category }) => (
-                <RecentChip
+              {slots.map(({ name, category, phase }) => (
+                <RecSlot
                   key={name}
                   name={name}
                   category={category}
-                  done={addedSet.has(name)}
-                  onAdd={handleAdd}
+                  phase={phase}
+                  onAdd={handleRecAdd}
                 />
               ))}
             </div>
