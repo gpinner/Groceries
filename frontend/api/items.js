@@ -25,5 +25,13 @@ export default async function handler(req, res) {
     return res.status(201).json(rows[0]);
   }
 
+  // DELETE /api/items?listId=X&checked=true  — clear all checked items for a list
+  if (req.method === 'DELETE') {
+    const { listId } = req.query;
+    if (!listId) return res.status(400).json({ error: 'listId is required' });
+    await pool.query('DELETE FROM items WHERE list_id = $1 AND checked = TRUE', [listId]);
+    return res.status(204).end();
+  }
+
   res.status(405).json({ error: 'Method not allowed' });
 }

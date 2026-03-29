@@ -202,7 +202,7 @@ export default function App() {
     }
   };
 
-  /* Toggle checked — optimistic update, revert on API failure */
+  /* Toggle checked — optimistic update, then confirm from DB response */
   const toggleChecked = async (id, checked) => {
     setItems(prev => prev.map(i => i.id === id ? { ...i, checked } : i));
     try {
@@ -211,9 +211,12 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ checked }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error('API error');
+      // Update with the actual saved value so UI always mirrors DB
+      const saved = await res.json();
+      setItems(prev => prev.map(i => i.id === id ? saved : i));
     } catch {
-      // Revert the optimistic update so DB and UI stay in sync
+      // Revert optimistic update on failure
       setItems(prev => prev.map(i => i.id === id ? { ...i, checked: !checked } : i));
     }
   };
@@ -259,13 +262,20 @@ export default function App() {
   };
 
   const clearChecked = async () => {
-    await fetch(`${API}/items/checked/all?listId=${currentListId}`, { method: 'DELETE' });
+    // Optimistic removal first
     setItems(prev => prev.filter(item => !item.checked));
+    try {
+      const res = await fetch(`${API}/items?listId=${currentListId}&checked=true`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+    } catch {
+      // On failure, re-fetch so DB and UI stay in sync
+      fetchItems();
+    }
   };
 
   /* ── Derived data ── */
   const filtered = tab === 'done'
-    ? items.filter(i => i.checked && !exitingIds.has(i.id))
+    ? items.filter(i => i.checked)
     : items.filter(i => !i.checked || exitingIds.has(i.id));
 
   const grouped = filtered.reduce((acc, item) => {
