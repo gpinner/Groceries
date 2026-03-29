@@ -25,9 +25,7 @@ const LEGACY_CAT_EMOJI = {
   'Other': '📦',
 };
 
-// Per-product emoji — covers the most common grocery items
 const PRODUCT_EMOJIS = {
-  // Fresh Produce
   'Bananas':'🍌','Apples':'🍎','Tomatoes':'🍅','Onions':'🧅','Potatoes':'🥔',
   'Carrots':'🥕','Lettuce':'🥬','Spinach':'🥬','Avocado':'🥑','Lemons':'🍋',
   'Garlic':'🧄','Broccoli':'🥦','Cucumber':'🥒','Bell Peppers':'🫑','Mushrooms':'🍄',
@@ -36,33 +34,26 @@ const PRODUCT_EMOJIS = {
   'Pineapple':'🍍','Cherries':'🍒','Kiwi':'🥝','Corn':'🌽','Eggplant':'🍆',
   'Sweet Potato':'🥔','Sweet Potatoes':'🥔','Peas':'🫛','Zucchini':'🥒',
   'Radishes':'🌱','Celery':'🥬','Cauliflower':'🥦','Asparagus':'🌿',
-  // Dairy & Eggs
   'Milk':'🥛','Eggs':'🥚','Butter':'🧈','Cheese':'🧀','Cheddar Cheese':'🧀',
   'Yogurt':'🥛','Sour Cream':'🥛','Cream Cheese':'🧀','Heavy Cream':'🥛',
   'Mozzarella':'🧀','Parmesan':'🧀','Greek Yogurt':'🥛','Oat Milk':'🥛',
-  // Bakery & Deli
   'Sandwich Bread':'🍞','Bread':'🍞','Bagels':'🥯','Croissants':'🥐','Baguette':'🥖',
   'Tortillas':'🫓','Rolls':'🍞','Pita Bread':'🫓','Sourdough':'🍞',
   'Chicken':'🍗','Chicken Breast':'🍗','Chicken Thighs':'🍗','Chicken Wings':'🍗',
   'Ground Beef':'🥩','Beef':'🥩','Salmon':'🐟','Shrimp':'🦐','Pork':'🥩',
   'Pork Chops':'🥩','Turkey':'🦃','Tuna':'🐟','Bacon':'🥓','Sausage':'🌭',
   'Ham':'🍖','Salami':'🍖','Turkey Slices':'🍖','Roast Beef':'🥩','Prosciutto':'🍖',
-  // Frozen
   'Ice Cream':'🍦','Frozen Pizza':'🍕','Pizza':'🍕','Frozen Waffles':'🧇',
   'French Fries':'🍟','Chicken Nuggets':'🍗','Frozen Vegetables':'🥦',
-  // Pantry
   'Rice':'🍚','Pasta':'🍝','Olive Oil':'🫙','Salt':'🧂','Flour':'🌾',
   'Sugar':'🍬','Honey':'🍯','Ketchup':'🍅','Mayonnaise':'🥚','Oats':'🌾',
   'Beans':'🫘','Lentils':'🫘','Chickpeas':'🫘','Cereal':'🥣','Peanut Butter':'🥜',
   'Canned Tomatoes':'🍅','Tomato Paste':'🍅','Soy Sauce':'🫙','Vinegar':'🫙',
-  // Beverages
   'Orange Juice':'🍊','Water':'💧','Sparkling Water':'💧','Wine':'🍷','Beer':'🍺',
   'Coffee':'☕','Tea':'🍵','Juice':'🧃','Soda':'🥤','Kombucha':'🍵',
-  // Snacks & Sweets
   'Chips':'🥔','Nuts':'🥜','Mixed Nuts':'🥜','Dark Chocolate':'🍫','Chocolate':'🍫',
   'Cookies':'🍪','Crackers':'🍪','Popcorn':'🍿','Almonds':'🥜','Pretzels':'🥨',
   'Candy':'🍬','Granola Bars':'🍫','Granola':'🌾',
-  // Home & Care
   'Dish Soap':'🧼','Paper Towels':'🧻','Toilet Paper':'🧻',
   'Laundry Detergent':'🧺','Trash Bags':'🗑️','Sponges':'🧽','Hand Soap':'🧼',
   'Shampoo':'🧴','Conditioner':'🧴','Toothpaste':'🦷','Deodorant':'🧴',
@@ -71,13 +62,12 @@ const PRODUCT_EMOJIS = {
 };
 
 export function productEmoji(name, category) {
-  if (PRODUCT_EMOJIS[name]) return PRODUCT_EMOJIS[name];
-  if (CAT_EMOJI[category])  return CAT_EMOJI[category];
+  if (PRODUCT_EMOJIS[name])       return PRODUCT_EMOJIS[name];
+  if (CAT_EMOJI[category])        return CAT_EMOJI[category];
   if (LEGACY_CAT_EMOJI[category]) return LEGACY_CAT_EMOJI[category];
   return '🏷️';
 }
 
-// Recently added chip — shared by default view and category view
 function RecentChip({ name, category, done, onAdd }) {
   return (
     <button
@@ -93,35 +83,31 @@ function RecentChip({ name, category, done, onAdd }) {
 export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts = [] }) {
   const [query, setQuery]             = useState('');
   const [selectedCat, setSelectedCat] = useState(null);
-  const [expanded, setExpanded]       = useState(false);
   const [addedSet, setAddedSet]       = useState(new Set());
   const inputRef = useRef(null);
 
+  // Focus search input when panel opens
   useEffect(() => {
-    const t = setTimeout(() => inputRef.current?.focus(), 80);
+    const t = setTimeout(() => inputRef.current?.focus(), 60);
     return () => clearTimeout(t);
   }, []);
-
-  const expand = () => { if (!expanded) setExpanded(true); };
 
   const capitalize = v => v ? v.charAt(0).toUpperCase() + v.slice(1) : v;
 
   const handleQueryChange = val => {
     const c = capitalize(val);
     setQuery(c);
-    if (c) { expand(); setSelectedCat(null); }
+    if (c) setSelectedCat(null);
   };
 
   const handleCatSelect = cat => {
     setSelectedCat(cat);
-    expand();
     setQuery('');
-    setTimeout(() => inputRef.current?.focus(), 100);
+    setTimeout(() => inputRef.current?.focus(), 60);
   };
 
   const handleBack = () => { setSelectedCat(null); setQuery(''); };
 
-  // Flash ✓ briefly but keep the chip visible — no removal from strip
   const handleAdd = (name, category) => {
     onQuickAdd(name, category);
     setAddedSet(prev => new Set([...prev, name]));
@@ -151,151 +137,156 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
   const recent20    = recentProducts.slice(0, 20);
-  // Show recent strip unless we're actively searching
   const showRecent  = recent20.length > 0 && !query.trim();
 
   return (
-    <>
-      <div className="sheet-backdrop" onClick={onClose} />
-      <div className={`add-sheet ${expanded ? 'full' : 'half'}`}>
-        <div className="sheet-handle" />
+    <div className="add-panel">
 
-        {/* Search bar — PINNED AT TOP so the mobile keyboard never covers it */}
-        <div className="sheet-search-bar">
-          <div className="sheet-search-wrap">
-            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input ref={inputRef} className="sheet-search" type="text"
-              placeholder={selectedCat ? `Search in ${selectedCat}…` : 'Search products…'}
-              value={query} onChange={e => handleQueryChange(e.target.value)} />
-            {query && (
-              <button className="search-clear" onClick={() => handleQueryChange('')}>✕</button>
-            )}
-          </div>
+      {/* ── Search bar — top of panel, always visible ── */}
+      <div className="add-search-bar">
+        {/* Back / close */}
+        <button className="add-search-close" onClick={selectedCat ? handleBack : onClose} aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+            strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </button>
+
+        <div className="add-search-wrap">
+          <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            ref={inputRef}
+            className="add-search-input"
+            type="text"
+            placeholder={selectedCat ? `Search in ${selectedCat}…` : 'Search products…'}
+            value={query}
+            onChange={e => handleQueryChange(e.target.value)}
+          />
+          {query && (
+            <button className="search-clear" onClick={() => handleQueryChange('')}>✕</button>
+          )}
         </div>
 
-        {/* Category header — only when inside a category */}
         {showCatView && (
-          <div className="sheet-cat-header">
-            <button className="back-btn" onClick={handleBack}>←</button>
-            <span className="sheet-cat-title">
-              {CAT_EMOJI[selectedCat]} {selectedCat}
-            </span>
-            <button className="custom-link" onClick={() => onCustom(selectedCat)}>Custom</button>
-          </div>
+          <button className="custom-link" onClick={() => onCustom(selectedCat)}>Custom</button>
         )}
+      </div>
 
-        {/* Recently added strip — outside .sheet-body so overflow-x:hidden
-            on sheet-body doesn't kill horizontal touch-scroll.
-            touch-action:pan-x on .recent-scroll handles the rest. */}
-        {showRecent && (
-          <div className="recent-outer">
-            <p className="sheet-section-label">Recently added</p>
-            <div className="recent-scroll">
-              {recent20.map(({ name, category }) => (
-                <RecentChip
-                  key={name}
-                  name={name}
-                  category={category}
-                  done={addedSet.has(name)}
-                  onAdd={handleAdd}
-                />
-              ))}
-            </div>
+      {/* ── Category breadcrumb when inside a category ── */}
+      {showCatView && (
+        <div className="add-cat-breadcrumb">
+          <span className="add-cat-breadcrumb-label">
+            {CAT_EMOJI[selectedCat]} {selectedCat}
+          </span>
+        </div>
+      )}
+
+      {/* ── Recently added — horizontal scroll strip ── */}
+      {showRecent && (
+        <div className="recent-outer">
+          <p className="sheet-section-label">Recently added</p>
+          <div className="recent-scroll">
+            {recent20.map(({ name, category }) => (
+              <RecentChip
+                key={name}
+                name={name}
+                category={category}
+                done={addedSet.has(name)}
+                onAdd={handleAdd}
+              />
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ── Vertically scrollable body ── */}
-        <div className="sheet-body">
+      {/* ── Scrollable content area ── */}
+      <div className="add-panel-body">
 
-          {/* Default view: categories grid */}
-          {showGrid && (
-            <div className="sheet-section">
-              <p className="sheet-section-label">Categories</p>
-              <div className="add-category-grid">
-                {CATEGORIES.map(({ name, emoji }) => (
-                  <button key={name} className="add-category-tile" onClick={() => handleCatSelect(name)}>
-                    <span className="add-cat-emoji">{emoji}</span>
-                    <span className="add-cat-name">{name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Global search results */}
-          {showSearch && (
-            <div className="product-list">
-              {globalResults.map(({ name, category }) => (
-                <button key={`${category}-${name}`} className="product-row"
-                  onClick={() => handleAdd(name, category)}>
-                  <span className="product-row-emoji">{productEmoji(name, category)}</span>
-                  <div className="product-row-info">
-                    <span className="product-name">{name}</span>
-                    <span className="product-cat-badge">
-                      {CAT_EMOJI[category] ?? '🏷️'} {category}
-                    </span>
-                  </div>
-                  {addedSet.has(name)
-                    ? <span className="product-added">✓</span>
-                    : <span className="product-add">+</span>}
+        {/* Default view: categories grid */}
+        {showGrid && (
+          <div className="sheet-section">
+            <p className="sheet-section-label">Categories</p>
+            <div className="add-category-grid">
+              {CATEGORIES.map(({ name, emoji }) => (
+                <button key={name} className="add-category-tile" onClick={() => handleCatSelect(name)}>
+                  <span className="add-cat-emoji">{emoji}</span>
+                  <span className="add-cat-name">{name}</span>
                 </button>
               ))}
-              <CustomQueryRow query={query} onAdd={n => handleAdd(n, 'Other')} />
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Category product view */}
-          {showCatView && (
-            <div className="product-list">
-              {query.trim() ? (
-                <>
-                  <CategoryProductRows
-                    items={filteredCatProducts.common}
-                    category={selectedCat}
-                    onAdd={n => handleAdd(n, selectedCat)}
-                    addedSet={addedSet}
-                  />
-                  <CustomQueryRow query={query} onAdd={n => handleAdd(n, selectedCat)} />
-                </>
-              ) : (
-                <>
-                  <QuickSection
-                    title="Common"
-                    items={filteredCatProducts.common.map(name => ({
-                      name, category: selectedCat,
-                      emoji: productEmoji(name, selectedCat),
-                    }))}
-                    addedSet={addedSet}
-                    onAdd={handleAdd}
-                  />
-                  {filteredCatProducts.rest.length > 0 && (
-                    <div className="product-section">
-                      <p className="section-label">All</p>
-                      <CategoryProductRows
-                        items={filteredCatProducts.rest}
-                        category={selectedCat}
-                        onAdd={n => handleAdd(n, selectedCat)}
-                        addedSet={addedSet}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Global search results */}
+        {showSearch && (
+          <div className="product-list">
+            {globalResults.map(({ name, category }) => (
+              <button key={`${category}-${name}`} className="product-row"
+                onClick={() => handleAdd(name, category)}>
+                <span className="product-row-emoji">{productEmoji(name, category)}</span>
+                <div className="product-row-info">
+                  <span className="product-name">{name}</span>
+                  <span className="product-cat-badge">
+                    {CAT_EMOJI[category] ?? '🏷️'} {category}
+                  </span>
+                </div>
+                {addedSet.has(name)
+                  ? <span className="product-added">✓</span>
+                  : <span className="product-add">+</span>}
+              </button>
+            ))}
+            <CustomQueryRow query={query} onAdd={n => handleAdd(n, 'Other')} />
+          </div>
+        )}
+
+        {/* Category product view */}
+        {showCatView && (
+          <div className="product-list">
+            {query.trim() ? (
+              <>
+                <CategoryProductRows
+                  items={filteredCatProducts.common}
+                  category={selectedCat}
+                  onAdd={n => handleAdd(n, selectedCat)}
+                  addedSet={addedSet}
+                />
+                <CustomQueryRow query={query} onAdd={n => handleAdd(n, selectedCat)} />
+              </>
+            ) : (
+              <>
+                <QuickSection
+                  title="Common"
+                  items={filteredCatProducts.common.map(name => ({
+                    name, category: selectedCat,
+                    emoji: productEmoji(name, selectedCat),
+                  }))}
+                  addedSet={addedSet}
+                  onAdd={handleAdd}
+                />
+                {filteredCatProducts.rest.length > 0 && (
+                  <div className="product-section">
+                    <p className="section-label">All</p>
+                    <CategoryProductRows
+                      items={filteredCatProducts.rest}
+                      category={selectedCat}
+                      onAdd={n => handleAdd(n, selectedCat)}
+                      addedSet={addedSet}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
-/*
-  Category product rows: [emoji] [name] [grey + button]
-  Used in "All" list and filtered search inside a category.
-*/
 function CategoryProductRows({ items, category, onAdd, addedSet }) {
   return items.map(name => (
     <button key={name} className="product-row" onClick={() => onAdd(name)}>
@@ -308,7 +299,6 @@ function CategoryProductRows({ items, category, onAdd, addedSet }) {
   ));
 }
 
-/* 3-column emoji card grid — for Common section inside a category */
 function QuickSection({ title, items, addedSet, onAdd }) {
   if (!items.length) return null;
   return (

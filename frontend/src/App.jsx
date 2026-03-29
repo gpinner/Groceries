@@ -484,40 +484,50 @@ export default function App() {
             </div>
           </header>
 
-          <div className="scroll-area">
-            {loading && <p className="state-msg">Loading...</p>}
-            {error   && <p className="state-msg error">{error}</p>}
+          {/* Add panel replaces the list — inline, no overlay */}
+          {sheet === 'add' ? (
+            <AddSheet
+              onQuickAdd={quickAdd}
+              onCustom={cat => { setCustomCategory(cat ?? 'Other'); setSheet('custom'); }}
+              onClose={() => setSheet(null)}
+              recentProducts={recentProducts}
+            />
+          ) : (
+            <div className="scroll-area">
+              {loading && <p className="state-msg">Loading...</p>}
+              {error   && <p className="state-msg error">{error}</p>}
 
-            {!loading && !error && sortedCategories.length === 0 && (
-              <div className="state-msg">
-                {tab === 'all' ? (
-                  <>
-                    <span style={{fontSize:40}}>🛒</span>
-                    <span style={{marginTop:8,display:'block'}}>Your list is empty</span>
-                    <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Tap + to add items</span>
-                  </>
-                ) : (
-                  <>
-                    <span style={{fontSize:40}}>✅</span>
-                    <span style={{marginTop:8,display:'block'}}>Nothing here yet</span>
-                    <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Check items off your list</span>
-                  </>
-                )}
-              </div>
-            )}
+              {!loading && !error && sortedCategories.length === 0 && (
+                <div className="state-msg">
+                  {tab === 'all' ? (
+                    <>
+                      <span style={{fontSize:40}}>🛒</span>
+                      <span style={{marginTop:8,display:'block'}}>Your list is empty</span>
+                      <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Tap + to add items</span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{fontSize:40}}>✅</span>
+                      <span style={{marginTop:8,display:'block'}}>Nothing here yet</span>
+                      <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Check items off your list</span>
+                    </>
+                  )}
+                </div>
+              )}
 
-            {sortedCategories.map(([category, catItems]) => (
-              <CategoryGroup
-                key={category}
-                category={category}
-                items={catItems}
-                onToggle={toggleChecked}
-                onCheck={checkItem}
-                onDelete={deleteItem}
-                onUpdate={updateItem}
-              />
-            ))}
-          </div>
+              {sortedCategories.map(([category, catItems]) => (
+                <CategoryGroup
+                  key={category}
+                  category={category}
+                  items={catItems}
+                  onToggle={toggleChecked}
+                  onCheck={checkItem}
+                  onDelete={deleteItem}
+                  onUpdate={updateItem}
+                />
+              ))}
+            </div>
+          )}
 
           {tab === 'done' && checkedCount > 0 && (
             <div className="done-footer">
@@ -551,15 +561,6 @@ export default function App() {
           onStoreChange={setStoreId}
           onClose={() => setSheet(null)}
           top={sortPanelTop}
-        />
-      )}
-
-      {sheet === 'add' && (
-        <AddSheet
-          onQuickAdd={quickAdd}
-          onCustom={cat => { setCustomCategory(cat ?? 'Other'); setSheet('custom'); }}
-          onClose={() => setSheet(null)}
-          recentProducts={recentProducts}
         />
       )}
 
