@@ -408,6 +408,19 @@ export default function App() {
   const pendingCount = items.filter(i => !i.checked).length;
   const currentList  = lists.find(l => l.id === currentListId);
 
+  // Bounce animation on the Shopping badge whenever pendingCount increases
+  const prevPendingRef = useRef(pendingCount);
+  const [countBump, setCountBump] = useState(false);
+  useEffect(() => {
+    if (pendingCount > prevPendingRef.current) {
+      setCountBump(true);
+      const t = setTimeout(() => setCountBump(false), 700);
+      prevPendingRef.current = pendingCount;
+      return () => clearTimeout(t);
+    }
+    prevPendingRef.current = pendingCount;
+  }, [pendingCount]);
+
   return (
     <div className="app" ref={appRef}>
 
@@ -532,7 +545,7 @@ export default function App() {
                 onClick={() => { if (sheet === 'add' || addPanelClosing) { closeAddPanel(); } else { setTab('all'); } }}
               >
                 Shopping
-                {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
+                {pendingCount > 0 && <span className={`tab-count${countBump ? ' bump' : ''}`}>{pendingCount}</span>}
               </button>
               <button
                 className={`tab-btn ${tab === 'done' && sheet !== 'add' && !addPanelClosing ? 'active' : ''}`}
