@@ -5,6 +5,7 @@ import CategoryGroup from './components/CategoryGroup.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ListsSheet from './components/ListsSheet.jsx';
 import SortSheet from './components/SortSheet.jsx';
+import UserDrawer from './components/UserDrawer.jsx';
 import VoiceModal from './components/VoiceModal.jsx';
 import { useVoiceInput } from './hooks/useVoiceInput.js';
 import { PRODUCTS } from './data/products.js';
@@ -28,6 +29,9 @@ function matchVoiceToProduct(transcript) {
 }
 
 const API = '/api';
+
+// Dev user — will be replaced by real auth later
+const CURRENT_USER = { id: 1, name: 'Greg Pin', email: 'greg@example.com' };
 
 const SORT_OPTIONS = [
   { id: 'az',     label: 'A → Z' },
@@ -68,15 +72,15 @@ export default function App() {
   const [sortBy, setSortBy]                 = useState('az');
   const [storeId, setStoreId]               = useState(null);
   const voice = useVoiceInput();
-  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort'
+  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort' | 'user'
   const [customCategory, setCustomCategory] = useState('Other');
   const sortBtnRef                          = useRef(null);
   const appRef                              = useRef(null);
   const [sortPanelTop, setSortPanelTop]     = useState(60);
 
-  // Load lists once on mount
+  // Load lists for the current user on mount
   useEffect(() => {
-    fetch(`${API}/lists`)
+    fetch(`${API}/lists?userId=${CURRENT_USER.id}`)
       .then(r => r.json())
       .then(data => {
         setLists(data);
@@ -108,7 +112,7 @@ export default function App() {
     const res = await fetch(`${API}/lists`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, userId: CURRENT_USER.id }),
     });
     const list = await res.json();
     setLists(prev => [...prev, list]);
@@ -130,7 +134,7 @@ export default function App() {
       setLists(prev => prev.map(l => l.id === id ? updated : l));
     } catch {
       // Revert by re-fetching the real state
-      fetch(`${API}/lists`).then(r => r.json()).then(setLists).catch(() => {});
+      fetch(`${API}/lists?userId=${CURRENT_USER.id}`).then(r => r.json()).then(setLists).catch(() => {});
     }
   };
 
@@ -321,7 +325,7 @@ export default function App() {
         ))}
 
         {tab === 'done' && checkedCount > 0 && (
-          <div className="done-actions">
+          <div className="done-footer">
             <button className="restore-all-btn" onClick={() => items.filter(i => i.checked).forEach(i => toggleChecked(i.id, false))}>
               ↩ Restore all
             </button>
@@ -379,9 +383,17 @@ export default function App() {
         />
       )}
 
+      {sheet === 'user' && (
+        <UserDrawer
+          user={CURRENT_USER}
+          onClose={() => setSheet(null)}
+        />
+      )}
+
       <BottomNav
         onAddPress={() => setSheet('add')}
         onListsPress={() => setSheet('lists')}
+        onUserPress={() => setSheet('user')}
         onVoiceStart={handleVoiceStart}
         onVoiceStop={handleVoiceStop}
         isListening={voice.listening}

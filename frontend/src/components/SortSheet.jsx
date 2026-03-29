@@ -34,7 +34,7 @@ export default function SortSheet({ sortBy, storeId, onSortChange, onStoreChange
   return (
     <>
       <div className="sort-backdrop" onClick={onClose} />
-      <div className="sort-panel" style={{ top: `${top}px` }}>
+      <div className={`sort-panel${showStores ? ' expanded' : ''}`} style={{ top: `${top}px` }}>
         {/* Toggle group — fixed, does not scroll */}
         <div className="sort-panel-header">
           <div className="sort-toggle-group">

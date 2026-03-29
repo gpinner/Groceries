@@ -3,7 +3,7 @@ import './BottomNav.css';
 
 const LONG_PRESS_MS = 380;
 
-export default function BottomNav({ onAddPress, onListsPress, onVoiceStart, onVoiceStop, isListening }) {
+export default function BottomNav({ onAddPress, onListsPress, onUserPress, onVoiceStart, onVoiceStop, isListening }) {
   const timerRef    = useRef(null);
   const didVoiceRef = useRef(false);
 
@@ -44,7 +44,7 @@ export default function BottomNav({ onAddPress, onListsPress, onVoiceStart, onVo
         <span className="nav-label">Lists</span>
       </button>
 
-      {/* Add — 33% green zone */}
+      {/* Add — 33% green zone, full height */}
       <button
         className={`nav-add ${isListening ? 'listening' : ''}`}
         onPointerDown={handlePointerDown}
@@ -58,13 +58,13 @@ export default function BottomNav({ onAddPress, onListsPress, onVoiceStart, onVo
         }
       </button>
 
-      {/* Settings — 33% */}
-      <button className="nav-tab" onClick={() => {}}>
+      {/* User — 33% */}
+      <button className="nav-tab" onClick={onUserPress}>
         <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
         </svg>
-        <span className="nav-label">Settings</span>
+        <span className="nav-label">Account</span>
       </button>
     </nav>
   );
