@@ -400,8 +400,12 @@ export default function App() {
           />
         ))}
 
-        {tab === 'done' && checkedCount > 0 && (
-          <div className="done-footer">
+      </div>
+
+      {tab === 'done' && checkedCount > 0 && (
+        <div className="done-footer">
+          <div className="done-footer-gradient" />
+          <div className="done-footer-buttons">
             <button className="restore-all-btn" onClick={() => items.filter(i => i.checked).forEach(i => toggleChecked(i.id, false))}>
               ↩ Restore all
             </button>
@@ -409,8 +413,8 @@ export default function App() {
               🗑️ Clear all
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {sheet === 'sort' && (
         <SortSheet
