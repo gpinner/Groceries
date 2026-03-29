@@ -24,8 +24,7 @@
   will-change: transform;
 }
 
-/* Tall default so categories + recent strip are both comfortably visible */
-.add-sheet.half { max-height: 86%; }
+.add-sheet.half { max-height: 90%; }
 .add-sheet.full { max-height: 96%; }
 
 /* ── Handle ── */
@@ -34,7 +33,7 @@
   height: 4px;
   background: #E0E8E0;
   border-radius: 2px;
-  margin: 14px auto 0;
+  margin: 14px auto 6px;
   flex-shrink: 0;
 }
 
@@ -77,19 +76,11 @@
   flex-shrink: 0;
 }
 
-/* ── Scrollable body ── */
-.sheet-body {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  min-height: 0;
+/* ── Recently added — lives OUTSIDE sheet-body so overflow-x works ── */
+.recent-outer {
+  flex-shrink: 0;
+  /* No overflow set — children handle their own overflow */
 }
-
-.sheet-body::-webkit-scrollbar { display: none; }
-
-/* ── Section labels ── */
-.sheet-section { margin-bottom: 4px; }
 
 .sheet-section-label,
 .section-label {
@@ -98,24 +89,30 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #8A9099;
-  padding: 12px 18px 6px;
+  padding: 10px 18px 6px;
 }
 
-/* ── Recently added — horizontal scroll strip ── */
-/* Chip width ~92px so exactly 3 fit + 4th peeks ~55px on a 390px screen */
+/* ── Horizontal scroll strip ──
+   Phone frame is 390px wide.
+   chip=100px, gap=12px → 3 chips = 300px + 2 gaps = 324px.
+   Left padding 16px means 4th chip starts at 16+324+12 = 352px,
+   visible portion = 390-352 = 38px — clear peek inviting swipe.
+── */
 .recent-scroll {
   display: flex;
   flex-direction: row;
-  gap: 10px;
-  padding: 6px 18px 14px;
-  /* right padding small so 4th chip peeks naturally beyond viewport */
-  padding-right: 6px;
+  gap: 12px;
+  padding: 4px 0 14px 16px;
+  /* NO right padding — 4th chip naturally pokes out of frame */
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x mandatory;
+  /* cursor for desktop testing */
+  cursor: grab;
 }
 
+.recent-scroll:active { cursor: grabbing; }
 .recent-scroll::-webkit-scrollbar { display: none; }
 
 .recent-chip {
@@ -123,16 +120,18 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  /* 92px wide → 3 chips = 296px, 4th starts at 306px, peeks ~60-80px on most phones */
-  min-width: 92px;
-  max-width: 92px;
-  padding: 14px 8px 12px;
+  min-width: 100px;
+  max-width: 100px;
+  padding: 16px 8px 14px;
   background: #F6F8F6;
   border-radius: 18px;
   border: 1.5px solid transparent;
   scroll-snap-align: start;
   flex-shrink: 0;
   text-align: center;
+  /* Prevent text selection while swiping */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .recent-chip.chip-added {
@@ -162,30 +161,46 @@
   text-align: center;
 }
 
-/* ── Category grid — 3 columns, light green tiles ── */
-.category-grid {
+/* ── Scrollable body — only vertical scroll ── */
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+
+.sheet-body::-webkit-scrollbar { display: none; }
+
+.sheet-section { margin-bottom: 4px; }
+
+/* ── Category grid — 3 columns, light green tiles ──
+   Class renamed to .add-category-grid to avoid conflict
+   with CategorySheet.css which uses repeat(4, 1fr).
+── */
+.add-category-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   padding: 4px 14px 18px;
 }
 
-.category-tile {
+.add-category-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 20px 6px;
-  background: #C8E6D4;        /* clearly green, light but distinct */
+  background: #C8E6D4;
   border-radius: 18px;
   border: 1.5px solid #A8D4BB;
 }
 
-.category-tile:active { background: #A8D4BB; }
+.add-category-tile:active { background: #A8D4BB; }
 
-.cat-emoji { font-size: 28px; line-height: 1; }
+.add-cat-emoji { font-size: 28px; line-height: 1; }
 
-.cat-name {
+.add-cat-name {
   font-size: 12px;
   font-weight: var(--fw-bold);
   color: #1D5C40;
@@ -353,7 +368,7 @@
   min-width: 0;
 }
 
-.sheet-search:focus       { border: none !important; box-shadow: none !important; }
+.sheet-search:focus        { border: none !important; box-shadow: none !important; }
 .sheet-search::placeholder { color: #A8B4A8; font-weight: var(--fw-regular); }
 
 .search-clear {
@@ -366,5 +381,5 @@
   flex-shrink: 0;
 }
 
-@keyframes fadeIn  { from { opacity: 0; }             to { opacity: 1; } }
+@keyframes fadeIn  { from { opacity: 0; }                  to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }

@@ -8,8 +8,26 @@ const ALL_PRODUCTS = Object.entries(PRODUCTS).flatMap(([cat, { common, all }]) =
   [...new Set([...common, ...all])].map(name => ({ name, category: cat }))
 );
 
-// Per-product emoji; falls back to category emoji for unknowns
+// Build category emoji lookup from current names
+const CAT_EMOJI = Object.fromEntries(CATEGORIES.map(c => [c.name, c.emoji]));
+
+// Legacy category names (localStorage may still have old names)
+const LEGACY_CAT_EMOJI = {
+  'Produce': '🥦', 'Fresh Produce': '🥦',
+  'Meat & Seafood': '🍗', 'Meat': '🍗', 'Seafood': '🐟',
+  'Deli': '🍞', 'Bakery': '🍞', 'Bakery & Deli': '🍞',
+  'Dairy': '🥛', 'Dairy & Eggs': '🥛',
+  'Snacks': '🍿', 'Snacks & Sweets': '🍿',
+  'Pantry': '🥫',
+  'Beverages': '🥤', 'Drinks': '🥤',
+  'Household': '🧹', 'Home & Care': '🧹', 'Personal Care': '🧴',
+  'Frozen': '🧊',
+  'Other': '📦',
+};
+
+// Per-product emoji — covers the most common grocery items
 const PRODUCT_EMOJIS = {
+  // Fresh Produce
   'Bananas':'🍌','Apples':'🍎','Tomatoes':'🍅','Onions':'🧅','Potatoes':'🥔',
   'Carrots':'🥕','Lettuce':'🥬','Spinach':'🥬','Avocado':'🥑','Lemons':'🍋',
   'Garlic':'🧄','Broccoli':'🥦','Cucumber':'🥒','Bell Peppers':'🫑','Mushrooms':'🍄',
@@ -17,36 +35,63 @@ const PRODUCT_EMOJIS = {
   'Pears':'🍐','Peaches':'🍑','Watermelon':'🍉','Mango':'🥭','Mangoes':'🥭',
   'Pineapple':'🍍','Cherries':'🍒','Kiwi':'🥝','Corn':'🌽','Eggplant':'🍆',
   'Sweet Potato':'🥔','Sweet Potatoes':'🥔','Peas':'🫛','Zucchini':'🥒',
+  'Radishes':'🌱','Celery':'🥬','Cauliflower':'🥦','Asparagus':'🌿',
+  // Dairy & Eggs
   'Milk':'🥛','Eggs':'🥚','Butter':'🧈','Cheese':'🧀','Cheddar Cheese':'🧀',
   'Yogurt':'🥛','Sour Cream':'🥛','Cream Cheese':'🧀','Heavy Cream':'🥛',
   'Mozzarella':'🧀','Parmesan':'🧀','Greek Yogurt':'🥛','Oat Milk':'🥛',
+  // Bakery & Deli
+  'Sandwich Bread':'🍞','Bread':'🍞','Bagels':'🥯','Croissants':'🥐','Baguette':'🥖',
+  'Tortillas':'🫓','Rolls':'🍞','Pita Bread':'🫓','Sourdough':'🍞',
   'Chicken':'🍗','Chicken Breast':'🍗','Chicken Thighs':'🍗','Chicken Wings':'🍗',
   'Ground Beef':'🥩','Beef':'🥩','Salmon':'🐟','Shrimp':'🦐','Pork':'🥩',
   'Pork Chops':'🥩','Turkey':'🦃','Tuna':'🐟','Bacon':'🥓','Sausage':'🌭',
   'Ham':'🍖','Salami':'🍖','Turkey Slices':'🍖','Roast Beef':'🥩','Prosciutto':'🍖',
-  'Sandwich Bread':'🍞','Bread':'🍞','Bagels':'🥯','Croissants':'🥐','Baguette':'🥖',
-  'Tortillas':'🫓','Rolls':'🍞','Pita Bread':'🫓','Sourdough':'🍞',
+  // Frozen
   'Ice Cream':'🍦','Frozen Pizza':'🍕','Pizza':'🍕','Frozen Waffles':'🧇',
-  'French Fries':'🍟','Chicken Nuggets':'🍗',
+  'French Fries':'🍟','Chicken Nuggets':'🍗','Frozen Vegetables':'🥦',
+  // Pantry
   'Rice':'🍚','Pasta':'🍝','Olive Oil':'🫙','Salt':'🧂','Flour':'🌾',
   'Sugar':'🍬','Honey':'🍯','Ketchup':'🍅','Mayonnaise':'🥚','Oats':'🌾',
   'Beans':'🫘','Lentils':'🫘','Chickpeas':'🫘','Cereal':'🥣','Peanut Butter':'🥜',
-  'Canned Tomatoes':'🍅','Tomato Paste':'🍅',
+  'Canned Tomatoes':'🍅','Tomato Paste':'🍅','Soy Sauce':'🫙','Vinegar':'🫙',
+  // Beverages
   'Orange Juice':'🍊','Water':'💧','Sparkling Water':'💧','Wine':'🍷','Beer':'🍺',
-  'Coffee':'☕','Tea':'🍵','Juice':'🧃','Soda':'🥤','Oat Milk (bev)':'🥛',
+  'Coffee':'☕','Tea':'🍵','Juice':'🧃','Soda':'🥤','Kombucha':'🍵',
+  // Snacks & Sweets
   'Chips':'🥔','Nuts':'🥜','Mixed Nuts':'🥜','Dark Chocolate':'🍫','Chocolate':'🍫',
   'Cookies':'🍪','Crackers':'🍪','Popcorn':'🍿','Almonds':'🥜','Pretzels':'🥨',
-  'Candy':'🍬','Granola Bars':'🍫',
+  'Candy':'🍬','Granola Bars':'🍫','Granola':'🌾',
+  // Home & Care
   'Dish Soap':'🧼','Paper Towels':'🧻','Toilet Paper':'🧻',
   'Laundry Detergent':'🧺','Trash Bags':'🗑️','Sponges':'🧽','Hand Soap':'🧼',
   'Shampoo':'🧴','Conditioner':'🧴','Toothpaste':'🦷','Deodorant':'🧴',
   'Vitamins':'💊','Protein Powder':'💪','Pet Food':'🐾','Baby Food':'🍼',
-  'Ibuprofen':'💊','Hand Sanitizer':'🫧',
+  'Ibuprofen':'💊','Hand Sanitizer':'🫧','Sunscreen':'🧴',
 };
 
 function productEmoji(name, category) {
+  // 1. Exact product name match
   if (PRODUCT_EMOJIS[name]) return PRODUCT_EMOJIS[name];
-  return CATEGORIES.find(c => c.name === category)?.emoji ?? '🛒';
+  // 2. Current category name
+  if (CAT_EMOJI[category]) return CAT_EMOJI[category];
+  // 3. Legacy category name (old localStorage data)
+  if (LEGACY_CAT_EMOJI[category]) return LEGACY_CAT_EMOJI[category];
+  // 4. Generic tag as last resort (not a shopping cart)
+  return '🏷️';
+}
+
+// Recent chip component — extracted to avoid repeating JSX
+function RecentChip({ name, category, done, onAdd }) {
+  return (
+    <button
+      className={`recent-chip${done ? ' chip-added' : ''}`}
+      onClick={() => onAdd(name, category)}
+    >
+      <span className="recent-chip-emoji">{done ? '✓' : productEmoji(name, category)}</span>
+      <span className="recent-chip-name">{name}</span>
+    </button>
+  );
 }
 
 export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts = [] }) {
@@ -109,6 +154,7 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
   const recent20    = recentProducts.slice(0, 20);
+  const showRecent  = recent20.length > 0 && (showGrid || showCatView) && !query.trim();
 
   return (
     <>
@@ -121,51 +167,53 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
           <div className="sheet-cat-header">
             <button className="back-btn" onClick={handleBack}>←</button>
             <span className="sheet-cat-title">
-              {CATEGORIES.find(c => c.name === selectedCat)?.emoji} {selectedCat}
+              {CAT_EMOJI[selectedCat]} {selectedCat}
             </span>
             <button className="custom-link" onClick={() => onCustom(selectedCat)}>Custom</button>
           </div>
         )}
 
-        <div className="sheet-body">
-          {/* ── Default view: recent strip + categories ── */}
-          {showGrid && (
-            <>
-              {recent20.length > 0 && (
-                <div className="sheet-section">
-                  <p className="sheet-section-label">Recently added</p>
-                  <div className="recent-scroll">
-                    {recent20.map(({ name, category }) => {
-                      const done = addedSet.has(name);
-                      return (
-                        <button key={name} className={`recent-chip ${done ? 'chip-added' : ''}`}
-                          onClick={() => handleAdd(name, category)}>
-                          <span className="recent-chip-emoji">
-                            {done ? '✓' : productEmoji(name, category)}
-                          </span>
-                          <span className="recent-chip-name">{name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+        {/*
+          Recently added strip — intentionally OUTSIDE .sheet-body.
+          .sheet-body has overflow-x:hidden which would kill horizontal
+          touch-scroll. Placing it here gives it a clean scroll context.
+        */}
+        {showRecent && (
+          <div className="recent-outer">
+            <p className="sheet-section-label">Recently added</p>
+            <div className="recent-scroll">
+              {recent20.map(({ name, category }) => (
+                <RecentChip
+                  key={name}
+                  name={name}
+                  category={category}
+                  done={addedSet.has(name)}
+                  onAdd={handleAdd}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
-              <div className="sheet-section">
-                <p className="sheet-section-label">Categories</p>
-                <div className="category-grid">
-                  {CATEGORIES.map(({ name, emoji }) => (
-                    <button key={name} className="category-tile" onClick={() => handleCatSelect(name)}>
-                      <span className="cat-emoji">{emoji}</span>
-                      <span className="cat-name">{name}</span>
-                    </button>
-                  ))}
-                </div>
+        {/* ── Vertically scrollable body ── */}
+        <div className="sheet-body">
+
+          {/* Default view: categories grid */}
+          {showGrid && (
+            <div className="sheet-section">
+              <p className="sheet-section-label">Categories</p>
+              <div className="add-category-grid">
+                {CATEGORIES.map(({ name, emoji }) => (
+                  <button key={name} className="add-category-tile" onClick={() => handleCatSelect(name)}>
+                    <span className="add-cat-emoji">{emoji}</span>
+                    <span className="add-cat-name">{name}</span>
+                  </button>
+                ))}
               </div>
-            </>
+            </div>
           )}
 
-          {/* ── Global search ── */}
+          {/* Global search results */}
           {showSearch && (
             <div className="product-list">
               {globalResults.map(({ name, category }) => (
@@ -174,7 +222,7 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
                   <div className="product-row-info">
                     <span className="product-name">{name}</span>
                     <span className="product-cat-badge">
-                      {CATEGORIES.find(c => c.name === category)?.emoji} {category}
+                      {CAT_EMOJI[category] ?? '🏷️'} {category}
                     </span>
                   </div>
                   {addedSet.has(name)
@@ -186,7 +234,7 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
             </div>
           )}
 
-          {/* ── Category product view ── */}
+          {/* Category product view */}
           {showCatView && (
             <div className="product-list">
               {query.trim() ? (
@@ -197,25 +245,6 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
                 </>
               ) : (
                 <>
-                  {recent20.length > 0 && (
-                    <div className="sheet-section">
-                      <p className="sheet-section-label">Recently added</p>
-                      <div className="recent-scroll">
-                        {recent20.map(({ name, category }) => {
-                          const done = addedSet.has(name);
-                          return (
-                            <button key={name} className={`recent-chip ${done ? 'chip-added' : ''}`}
-                              onClick={() => handleAdd(name, category)}>
-                              <span className="recent-chip-emoji">
-                                {done ? '✓' : productEmoji(name, category)}
-                              </span>
-                              <span className="recent-chip-name">{name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                   <QuickSection title="Common"
                     items={filteredCatProducts.common.map(name => ({
                       name, category: selectedCat,
