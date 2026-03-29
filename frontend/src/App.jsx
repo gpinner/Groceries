@@ -195,9 +195,9 @@ export default function App() {
     if (!res.ok) return;
     const item = await res.json();
     setItems(prev => [...prev, item]);
-    // Track in recent products (deduplicate, keep newest first, max 10)
+    // Track in recent products (deduplicate, keep newest first, max 20)
     setRecentProducts(prev => {
-      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 10);
+      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 20);
       try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(next)); } catch {}
       return next;
     });

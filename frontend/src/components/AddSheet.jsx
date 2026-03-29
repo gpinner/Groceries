@@ -108,7 +108,7 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
   const showSearch  = !selectedCat && query.trim().length > 0;
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
-  const recent15    = recentProducts.slice(0, 15);
+  const recent20    = recentProducts.slice(0, 20);
 
   return (
     <>
@@ -131,11 +131,11 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
           {/* ── Default view: recent strip + categories ── */}
           {showGrid && (
             <>
-              {recent15.length > 0 && (
+              {recent20.length > 0 && (
                 <div className="sheet-section">
                   <p className="sheet-section-label">Recently added</p>
                   <div className="recent-scroll">
-                    {recent15.map(({ name, category }) => {
+                    {recent20.map(({ name, category }) => {
                       const done = addedSet.has(name);
                       return (
                         <button key={name} className={`recent-chip ${done ? 'chip-added' : ''}`}
@@ -197,11 +197,11 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
                 </>
               ) : (
                 <>
-                  {recent15.length > 0 && (
+                  {recent20.length > 0 && (
                     <div className="sheet-section">
                       <p className="sheet-section-label">Recently added</p>
                       <div className="recent-scroll">
-                        {recent15.map(({ name, category }) => {
+                        {recent20.map(({ name, category }) => {
                           const done = addedSet.has(name);
                           return (
                             <button key={name} className={`recent-chip ${done ? 'chip-added' : ''}`}

@@ -24,9 +24,9 @@
   will-change: transform;
 }
 
-/* Taller default height so categories are comfortably visible */
-.add-sheet.half { max-height: 72%; }
-.add-sheet.full { max-height: 94%; }
+/* Tall default so categories + recent strip are both comfortably visible */
+.add-sheet.half { max-height: 86%; }
+.add-sheet.full { max-height: 96%; }
 
 /* ── Handle ── */
 .sheet-handle {
@@ -102,17 +102,18 @@
 }
 
 /* ── Recently added — horizontal scroll strip ── */
+/* Chip width ~92px so exactly 3 fit + 4th peeks ~55px on a 390px screen */
 .recent-scroll {
   display: flex;
   flex-direction: row;
   gap: 10px;
-  padding: 4px 18px 12px;
+  padding: 6px 18px 14px;
+  /* right padding small so 4th chip peeks naturally beyond viewport */
+  padding-right: 6px;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x mandatory;
-  /* Show partial 4th chip to invite scrolling */
-  padding-right: 48px;
 }
 
 .recent-scroll::-webkit-scrollbar { display: none; }
@@ -121,12 +122,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  min-width: 68px;
-  max-width: 68px;
-  padding: 10px 6px;
+  gap: 6px;
+  /* 92px wide → 3 chips = 296px, 4th starts at 306px, peeks ~60-80px on most phones */
+  min-width: 92px;
+  max-width: 92px;
+  padding: 14px 8px 12px;
   background: #F6F8F6;
-  border-radius: 16px;
+  border-radius: 18px;
   border: 1.5px solid transparent;
   scroll-snap-align: start;
   flex-shrink: 0;
@@ -139,12 +141,12 @@
 }
 
 .recent-chip-emoji {
-  font-size: 24px;
+  font-size: 30px;
   line-height: 1;
 }
 
 .recent-chip.chip-added .recent-chip-emoji {
-  font-size: 16px;
+  font-size: 20px;
   color: #27AE60;
 }
 
@@ -160,12 +162,12 @@
   text-align: center;
 }
 
-/* ── Category grid — 3 columns, pastel green tiles ── */
+/* ── Category grid — 3 columns, light green tiles ── */
 .category-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 4px 14px 14px;
+  gap: 10px;
+  padding: 4px 14px 18px;
 }
 
 .category-tile {
@@ -173,20 +175,20 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 18px 8px;
-  background: #EEF8F1;        /* soft pastel green */
+  padding: 20px 6px;
+  background: #C8E6D4;        /* clearly green, light but distinct */
   border-radius: 18px;
-  border: 1.5px solid #D8F0E4;
+  border: 1.5px solid #A8D4BB;
 }
 
-.category-tile:active { background: #D4EEE0; }
+.category-tile:active { background: #A8D4BB; }
 
 .cat-emoji { font-size: 28px; line-height: 1; }
 
 .cat-name {
   font-size: 12px;
   font-weight: var(--fw-bold);
-  color: #2D6A4F;
+  color: #1D5C40;
   text-align: center;
   line-height: 1.25;
 }
