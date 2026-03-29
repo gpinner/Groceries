@@ -272,6 +272,11 @@
   color: #fff;
 }
 
+/* Dimmed state while add panel is open */
+.tab-btn.tab-adding {
+  opacity: 0.45;
+}
+
 /* ── Sort button ── */
 .header-right {
   position: relative;

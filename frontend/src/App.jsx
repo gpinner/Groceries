@@ -86,7 +86,8 @@ export default function App() {
     catch { return []; }
   });
   const voice = useVoiceInput();
-  const [sheet, setSheet]                   = useState(null); // null | 'add' | 'custom' | 'sort' | 'user'
+  const [sheet, setSheet]                   = useState(null);
+  const [addPanelClosing, setAddPanelClosing] = useState(false);
   const [customCategory, setCustomCategory] = useState('Other');
   const [editingListName, setEditingListName] = useState(false);
   const [tempListName, setTempListName]       = useState('');
@@ -213,9 +214,19 @@ export default function App() {
     setSheet(null);
   };
 
+  // Slide the add panel out then close — called by tab-button click or ← button
+  const closeAddPanel = () => {
+    setAddPanelClosing(true);
+    setTimeout(() => {
+      setSheet(null);
+      setAddPanelClosing(false);
+    }, 260);
+  };
+
   const trackRecent = (name, category) => {
     setRecentProducts(prev => {
-      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 20);
+      // Newest at front (index 0); max 25. Displayed reversed so newest appears at the END.
+      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 25);
       try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
@@ -473,11 +484,18 @@ export default function App() {
             </div>
 
             <div className="tab-row">
-              <button className={`tab-btn ${tab === 'all' ? 'active' : ''}`} onClick={() => setTab('all')}>
+              {/* Clicking Shopping/Done while add panel is open closes it */}
+              <button
+                className={`tab-btn ${tab === 'all' ? 'active' : ''} ${sheet === 'add' || addPanelClosing ? 'tab-adding' : ''}`}
+                onClick={() => { if (sheet === 'add') { closeAddPanel(); } else { setTab('all'); } }}
+              >
                 Shopping
                 {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
               </button>
-              <button className={`tab-btn ${tab === 'done' ? 'active' : ''}`} onClick={() => setTab('done')}>
+              <button
+                className={`tab-btn ${tab === 'done' ? 'active' : ''} ${sheet === 'add' || addPanelClosing ? 'tab-adding' : ''}`}
+                onClick={() => { if (sheet === 'add') { closeAddPanel(); } else { setTab('done'); } }}
+              >
                 Done
                 {checkedCount > 0 && <span className="tab-count">{checkedCount}</span>}
               </button>
@@ -485,11 +503,12 @@ export default function App() {
           </header>
 
           {/* Add panel replaces the list — inline, no overlay */}
-          {sheet === 'add' ? (
+          {(sheet === 'add' || addPanelClosing) ? (
             <AddSheet
+              closing={addPanelClosing}
               onQuickAdd={quickAdd}
               onCustom={cat => { setCustomCategory(cat ?? 'Other'); setSheet('custom'); }}
-              onClose={() => setSheet(null)}
+              onClose={closeAddPanel}
               recentProducts={recentProducts}
             />
           ) : (

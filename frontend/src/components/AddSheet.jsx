@@ -80,7 +80,7 @@ function RecentChip({ name, category, done, onAdd }) {
   );
 }
 
-export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts = [] }) {
+export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recentProducts = [] }) {
   const [query, setQuery]             = useState('');
   const [selectedCat, setSelectedCat] = useState(null);
   const [addedSet, setAddedSet]       = useState(new Set());
@@ -136,11 +136,12 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
   const showSearch  = !selectedCat && query.trim().length > 0;
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
-  const recent20    = recentProducts.slice(0, 20);
-  const showRecent  = recent20.length > 0 && !query.trim();
+  // 25 items max, reversed so newest appears at the end of the grid
+  const recent25    = recentProducts.slice(0, 25).reverse();
+  const showRecent  = recent25.length > 0 && !query.trim() && !selectedCat;
 
   return (
-    <div className="add-panel">
+    <div className={`add-panel${closing ? ' closing' : ''}`}>
 
       {/* ── Search bar — top of panel, always visible ── */}
       <div className="add-search-bar">
@@ -185,26 +186,26 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
         </div>
       )}
 
-      {/* ── Recently added — horizontal scroll strip ── */}
-      {showRecent && (
-        <div className="recent-outer">
-          <p className="sheet-section-label">Recently added</p>
-          <div className="recent-scroll">
-            {recent20.map(({ name, category }) => (
-              <RecentChip
-                key={name}
-                name={name}
-                category={category}
-                done={addedSet.has(name)}
-                onAdd={handleAdd}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* ── Scrollable content area ── */}
       <div className="add-panel-body">
+
+        {/* Recently added — 3-col grid, inside scrollable body, newest at end */}
+        {showRecent && (
+          <div className="recent-outer">
+            <p className="sheet-section-label">Recently added</p>
+            <div className="recent-grid">
+              {recent25.map(({ name, category }) => (
+                <RecentChip
+                  key={name}
+                  name={name}
+                  category={category}
+                  done={addedSet.has(name)}
+                  onAdd={handleAdd}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Default view: categories grid */}
         {showGrid && (
