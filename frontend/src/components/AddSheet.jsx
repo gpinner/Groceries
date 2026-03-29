@@ -137,8 +137,8 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recen
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
   // 25 items max, reversed so newest appears at the end of the grid
-  const recent25    = recentProducts.slice(0, 25).reverse();
-  const showRecent  = recent25.length > 0 && !query.trim() && !selectedCat;
+  const recent10    = recentProducts.slice(0, 10).reverse();
+  const showRecent  = recent10.length > 0 && !query.trim() && !selectedCat;
 
   return (
     <div className={`add-panel${closing ? ' closing' : ''}`}>
@@ -194,7 +194,7 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recen
           <div className="recent-outer">
             <p className="sheet-section-label">Recently added</p>
             <div className="recent-grid">
-              {recent25.map(({ name, category }) => (
+              {recent10.map(({ name, category }) => (
                 <RecentChip
                   key={name}
                   name={name}

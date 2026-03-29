@@ -486,15 +486,15 @@ export default function App() {
             <div className="tab-row">
               {/* Clicking Shopping/Done while add panel is open closes it */}
               <button
-                className={`tab-btn ${tab === 'all' ? 'active' : ''} ${sheet === 'add' || addPanelClosing ? 'tab-adding' : ''}`}
-                onClick={() => { if (sheet === 'add') { closeAddPanel(); } else { setTab('all'); } }}
+                className={`tab-btn ${tab === 'all' && sheet !== 'add' && !addPanelClosing ? 'active' : ''}`}
+                onClick={() => { if (sheet === 'add' || addPanelClosing) { closeAddPanel(); } else { setTab('all'); } }}
               >
                 Shopping
                 {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
               </button>
               <button
-                className={`tab-btn ${tab === 'done' ? 'active' : ''} ${sheet === 'add' || addPanelClosing ? 'tab-adding' : ''}`}
-                onClick={() => { if (sheet === 'add') { closeAddPanel(); } else { setTab('done'); } }}
+                className={`tab-btn ${tab === 'done' && sheet !== 'add' && !addPanelClosing ? 'active' : ''}`}
+                onClick={() => { if (sheet === 'add' || addPanelClosing) { closeAddPanel(); } else { setTab('done'); } }}
               >
                 Done
                 {checkedCount > 0 && <span className="tab-count">{checkedCount}</span>}

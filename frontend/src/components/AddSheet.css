@@ -135,7 +135,7 @@
   padding: 10px 18px 6px;
 }
 
-/* ── Recently added — 3-col grid inside scrollable body ── */
+/* ── Recently added — 2-col grid, condensed rows ── */
 .recent-outer {
   background: #fff;
   border-bottom: 1px solid #F2F5F2;
@@ -144,42 +144,43 @@
 
 .recent-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
   padding: 4px 14px 10px;
 }
 
+/* Same height as .tab-btn (~40px: 10px v-padding + 13px text × line-height) */
 .recent-chip {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
-  padding: 14px 6px 12px;
-  background: #F6F8F6;
-  border-radius: 14px;
+  gap: 8px;
+  padding: 0 12px;
+  height: 40px;
+  background: #F0F4F0;
+  border-radius: 12px;
   border: 1.5px solid transparent;
-  text-align: center;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  overflow: hidden;
 }
 
 .recent-chip.chip-added { background: #E8F8EE; border-color: #27AE60; }
 
-.recent-chip-emoji { font-size: 30px; line-height: 1; }
+.recent-chip-emoji { font-size: 18px; line-height: 1; flex-shrink: 0; }
 
-.recent-chip.chip-added .recent-chip-emoji { font-size: 20px; color: #27AE60; }
+.recent-chip.chip-added .recent-chip-emoji { color: #27AE60; }
 
 .recent-chip-name {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: var(--fw-semibold);
   color: #1a1a1a;
-  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
-  text-align: center;
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Scrollable content area ── */
