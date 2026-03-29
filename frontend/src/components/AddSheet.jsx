@@ -11,16 +11,16 @@ const ALL_PRODUCTS = Object.entries(PRODUCTS).flatMap(([cat, { common, all }]) =
 // Build category emoji lookup from current names
 const CAT_EMOJI = Object.fromEntries(CATEGORIES.map(c => [c.name, c.emoji]));
 
-// Legacy category names (localStorage may still have old names)
+// Legacy category names that may still exist in localStorage
 const LEGACY_CAT_EMOJI = {
-  'Produce': '🥦', 'Fresh Produce': '🥦',
+  'Produce': '🥦',
   'Meat & Seafood': '🍗', 'Meat': '🍗', 'Seafood': '🐟',
-  'Deli': '🍞', 'Bakery': '🍞', 'Bakery & Deli': '🍞',
-  'Dairy': '🥛', 'Dairy & Eggs': '🥛',
-  'Snacks': '🍿', 'Snacks & Sweets': '🍿',
+  'Deli': '🍞', 'Bakery': '🍞',
+  'Dairy': '🥛',
+  'Snacks': '🍿',
   'Pantry': '🥫',
   'Beverages': '🥤', 'Drinks': '🥤',
-  'Household': '🧹', 'Home & Care': '🧹', 'Personal Care': '🧴',
+  'Household': '🧹', 'Personal Care': '🧴',
   'Frozen': '🧊',
   'Other': '📦',
 };
@@ -70,18 +70,14 @@ const PRODUCT_EMOJIS = {
   'Ibuprofen':'💊','Hand Sanitizer':'🫧','Sunscreen':'🧴',
 };
 
-function productEmoji(name, category) {
-  // 1. Exact product name match
+export function productEmoji(name, category) {
   if (PRODUCT_EMOJIS[name]) return PRODUCT_EMOJIS[name];
-  // 2. Current category name
-  if (CAT_EMOJI[category]) return CAT_EMOJI[category];
-  // 3. Legacy category name (old localStorage data)
+  if (CAT_EMOJI[category])  return CAT_EMOJI[category];
   if (LEGACY_CAT_EMOJI[category]) return LEGACY_CAT_EMOJI[category];
-  // 4. Generic tag as last resort (not a shopping cart)
   return '🏷️';
 }
 
-// Recent chip component — extracted to avoid repeating JSX
+// Recently added chip — shared by default view and category view
 function RecentChip({ name, category, done, onAdd }) {
   return (
     <button
@@ -125,6 +121,7 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
 
   const handleBack = () => { setSelectedCat(null); setQuery(''); };
 
+  // Flash ✓ briefly but keep the chip visible — no removal from strip
   const handleAdd = (name, category) => {
     onQuickAdd(name, category);
     setAddedSet(prev => new Set([...prev, name]));
@@ -154,7 +151,8 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
   const recent20    = recentProducts.slice(0, 20);
-  const showRecent  = recent20.length > 0 && (showGrid || showCatView) && !query.trim();
+  // Show recent strip unless we're actively searching
+  const showRecent  = recent20.length > 0 && !query.trim();
 
   return (
     <>
@@ -174,9 +172,12 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
         )}
 
         {/*
-          Recently added strip — intentionally OUTSIDE .sheet-body.
-          .sheet-body has overflow-x:hidden which would kill horizontal
-          touch-scroll. Placing it here gives it a clean scroll context.
+          Recently added strip — sits OUTSIDE .sheet-body.
+          .sheet-body has overflow-x:hidden which would block horizontal
+          touch-scroll on this element.
+          touch-action: pan-x in .recent-scroll tells iOS/Android to handle
+          horizontal swipes here directly instead of deferring to a vertical
+          scroll ancestor.
         */}
         {showRecent && (
           <div className="recent-outer">
@@ -219,6 +220,7 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
               {globalResults.map(({ name, category }) => (
                 <button key={`${category}-${name}`} className="product-row"
                   onClick={() => handleAdd(name, category)}>
+                  <span className="product-row-emoji">{productEmoji(name, category)}</span>
                   <div className="product-row-info">
                     <span className="product-name">{name}</span>
                     <span className="product-cat-badge">
@@ -239,23 +241,34 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
             <div className="product-list">
               {query.trim() ? (
                 <>
-                  <ProductRows items={filteredCatProducts.common}
-                    onAdd={n => handleAdd(n, selectedCat)} addedSet={addedSet} />
+                  <CategoryProductRows
+                    items={filteredCatProducts.common}
+                    category={selectedCat}
+                    onAdd={n => handleAdd(n, selectedCat)}
+                    addedSet={addedSet}
+                  />
                   <CustomQueryRow query={query} onAdd={n => handleAdd(n, selectedCat)} />
                 </>
               ) : (
                 <>
-                  <QuickSection title="Common"
+                  <QuickSection
+                    title="Common"
                     items={filteredCatProducts.common.map(name => ({
                       name, category: selectedCat,
                       emoji: productEmoji(name, selectedCat),
                     }))}
-                    addedSet={addedSet} onAdd={handleAdd} />
+                    addedSet={addedSet}
+                    onAdd={handleAdd}
+                  />
                   {filteredCatProducts.rest.length > 0 && (
                     <div className="product-section">
                       <p className="section-label">All</p>
-                      <ProductRows items={filteredCatProducts.rest}
-                        onAdd={n => handleAdd(n, selectedCat)} addedSet={addedSet} />
+                      <CategoryProductRows
+                        items={filteredCatProducts.rest}
+                        category={selectedCat}
+                        onAdd={n => handleAdd(n, selectedCat)}
+                        addedSet={addedSet}
+                      />
                     </div>
                   )}
                 </>
@@ -284,6 +297,22 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
   );
 }
 
+/*
+  Category product rows: [emoji] [name] [grey + button]
+  Used in "All" list and filtered search inside a category.
+*/
+function CategoryProductRows({ items, category, onAdd, addedSet }) {
+  return items.map(name => (
+    <button key={name} className="product-row" onClick={() => onAdd(name)}>
+      <span className="product-row-emoji">{productEmoji(name, category)}</span>
+      <span className="product-name">{name}</span>
+      {addedSet.has(name)
+        ? <span className="product-added">✓</span>
+        : <span className="product-add-grey">+</span>}
+    </button>
+  ));
+}
+
 /* 3-column emoji card grid — for Common section inside a category */
 function QuickSection({ title, items, addedSet, onAdd }) {
   if (!items.length) return null;
@@ -304,17 +333,6 @@ function QuickSection({ title, items, addedSet, onAdd }) {
       </div>
     </div>
   );
-}
-
-function ProductRows({ items, onAdd, addedSet }) {
-  return items.map(name => (
-    <button key={name} className="product-row" onClick={() => onAdd(name)}>
-      <span className="product-name">{name}</span>
-      {addedSet.has(name)
-        ? <span className="product-added">✓</span>
-        : <span className="product-add">+</span>}
-    </button>
-  ));
 }
 
 function CustomQueryRow({ query, onAdd }) {

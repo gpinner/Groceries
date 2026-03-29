@@ -9,10 +9,9 @@
   display: flex;
   align-items: stretch;
   z-index: 50;
-  /* no box-shadow here — shadow lives on the green button */
 }
 
-/* Each slot — equal 33% */
+/* Each slot — equal thirds */
 .nav-tab,
 .nav-add {
   flex: 1;
@@ -28,7 +27,7 @@
   touch-action: none;
 }
 
-/* Side tabs */
+/* Side tabs — default grey */
 .nav-tab {
   gap: 3px;
   color: #B0B8B0;
@@ -36,7 +35,19 @@
   transition: color 0.15s;
 }
 
-.nav-tab:hover { color: #27AE60; }
+/* Invisible spacer for home view left slot */
+.nav-placeholder {
+  pointer-events: none;
+}
+
+/* Active green Lists button — shown when inside a list */
+.nav-lists-active {
+  color: #27AE60;
+}
+
+.nav-lists-active .nav-icon {
+  stroke: #27AE60;
+}
 
 .nav-icon {
   width: 22px;
@@ -50,16 +61,15 @@
   letter-spacing: 0.3px;
 }
 
-/* ── Center green zone — full height, soft side shadows ── */
+/* ── Center green zone ── */
 .nav-add {
   background: #27AE60;
   color: #fff;
-  align-self: stretch;   /* fills the full nav height */
+  align-self: stretch;
   transition: background 0.15s;
   box-shadow: -6px 0 14px rgba(0, 0, 0, 0.08), 6px 0 14px rgba(0, 0, 0, 0.08);
 }
 
-.nav-add:hover  { background: #22A055; }
 .nav-add:active { background: #1E9B4E !important; }
 
 .nav-add.listening {

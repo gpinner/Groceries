@@ -67,7 +67,9 @@ const LS_KEY        = `groceries_listId_u${CURRENT_USER.id}`;
 const LS_RECENT_KEY = `groceries_recent_u${CURRENT_USER.id}`;
 
 export default function App() {
+  const [view, setView]                     = useState('home'); // 'home' | 'list'
   const [lists, setLists]                   = useState([]);
+  const [listStats, setListStats]           = useState({});    // { [listId]: { shopping, done } }
   const [currentListId, setCurrentListId]   = useState(null);
   const [items, setItems]                   = useState([]);
   const [loading, setLoading]               = useState(true);
@@ -84,7 +86,7 @@ export default function App() {
     catch { return []; }
   });
   const voice = useVoiceInput();
-  const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort' | 'user'
+  const [sheet, setSheet]                   = useState(null); // null | 'add' | 'custom' | 'sort' | 'user'
   const [customCategory, setCustomCategory] = useState('Other');
   const [editingListName, setEditingListName] = useState(false);
   const [tempListName, setTempListName]       = useState('');
@@ -98,22 +100,51 @@ export default function App() {
     try { localStorage.setItem(LS_KEY, String(id)); } catch {}
   };
 
+  // Navigate into a list
+  const openList = (id) => {
+    switchList(id);
+    setItems([]);
+    setTab('all');
+    setView('list');
+  };
+
   // Load lists for the current user on mount
   useEffect(() => {
     fetch(`${API}/lists?userId=${CURRENT_USER.id}`)
       .then(r => r.json())
       .then(data => {
         setLists(data);
-        if (data.length === 0) return;
-        // Restore last-used list, fall back to first
+        if (data.length === 0) { setLoading(false); return; }
+        // Restore last-used list, fall back to first (but stay on home view)
         const saved = (() => { try { return localStorage.getItem(LS_KEY); } catch { return null; } })();
         const match = saved && data.find(l => l.id === Number(saved));
         setCurrentListId(match ? match.id : data[0].id);
       })
-      .catch(() => setError('Failed to load lists'));
+      .catch(() => { setError('Failed to load lists'); setLoading(false); });
   }, []);
 
-  // Load items whenever the current list changes
+  // Load item counts for ALL lists when on home view
+  useEffect(() => {
+    if (view !== 'home' || lists.length === 0) return;
+    const ctrl = new AbortController();
+    Promise.all(
+      lists.map(async (list) => {
+        try {
+          const r = await fetch(`${API}/items?listId=${list.id}`, { signal: ctrl.signal });
+          const its = await r.json();
+          return [list.id, {
+            shopping: its.filter(i => !i.checked).length,
+            done:     its.filter(i => i.checked).length,
+          }];
+        } catch { return [list.id, { shopping: 0, done: 0 }]; }
+      })
+    ).then(entries => {
+      if (!ctrl.signal.aborted) setListStats(Object.fromEntries(entries));
+    });
+    return () => ctrl.abort();
+  }, [view, lists]);
+
+  // Load items whenever the current list changes (and we're in list view)
   const fetchItems = useCallback(async () => {
     if (!currentListId) return;
     setLoading(true);
@@ -140,12 +171,10 @@ export default function App() {
     });
     const list = await res.json();
     setLists(prev => [...prev, list]);
-    switchList(list.id);
-    setItems([]);
+    openList(list.id);
   };
 
   const renameList = async (id, name) => {
-    // Optimistic update immediately so the user sees the change
     setLists(prev => prev.map(l => l.id === id ? { ...l, name } : l));
     try {
       const res = await fetch(`${API}/lists/${id}`, {
@@ -157,7 +186,6 @@ export default function App() {
       const updated = await res.json();
       setLists(prev => prev.map(l => l.id === id ? updated : l));
     } catch {
-      // Revert by re-fetching the real state
       fetch(`${API}/lists?userId=${CURRENT_USER.id}`).then(r => r.json()).then(setLists).catch(() => {});
     }
   };
@@ -185,8 +213,22 @@ export default function App() {
     setSheet(null);
   };
 
-  // Quick-add from the sheet — does NOT close the sheet
+  const trackRecent = (name, category) => {
+    setRecentProducts(prev => {
+      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 20);
+      try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
+  // Quick-add: if same product already exists unchecked, increment its qty instead
   const quickAdd = async (name, category) => {
+    const existing = items.find(i => i.name === name && !i.checked);
+    if (existing) {
+      await updateItem(existing.id, { quantity: (Number(existing.quantity) || 1) + 1 });
+      trackRecent(name, category);
+      return;
+    }
     const res = await fetch(`${API}/items`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -195,18 +237,12 @@ export default function App() {
     if (!res.ok) return;
     const item = await res.json();
     setItems(prev => [...prev, item]);
-    // Track in recent products (deduplicate, keep newest first, max 20)
-    setRecentProducts(prev => {
-      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 20);
-      try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(next)); } catch {}
-      return next;
-    });
+    trackRecent(name, category);
   };
 
   /* ── Voice ── */
   const handleVoiceStart = async () => {
     await voice.start((finalChunk) => {
-      // Auto-match on each final recognition chunk
       const result = matchVoiceToProduct(finalChunk);
       if (result.isKnown) {
         voice.stop();
@@ -234,38 +270,28 @@ export default function App() {
       });
       if (!res.ok) throw new Error('API error ' + res.status);
       const saved = await res.json();
-      // Verify the DB actually saved the value we sent
-      if (Boolean(saved.checked) !== checked) {
-        console.error('DB did not persist checked value', { expected: checked, got: saved.checked });
-        throw new Error('checked mismatch');
-      }
+      if (Boolean(saved.checked) !== checked) throw new Error('checked mismatch');
       setItems(prev => prev.map(i => i.id === id ? saved : i));
     } catch (err) {
       console.error('toggleChecked failed:', err);
-      // Revert optimistic update on any failure
       setItems(prev => prev.map(i => i.id === id ? { ...i, checked: !checked } : i));
     }
   };
 
-  /* Check with animation — keeps item visible in shopping list during exit animation */
+  /* Check with animation */
   const checkItem = (id, pos) => {
-    // Add to exitingIds so it stays in the shopping filter during animation
     setExitingIds(prev => new Set([...prev, id]));
-    // Show thumb emoji portal
     if (pos) {
       setThumbAnim(pos);
       setTimeout(() => setThumbAnim(null), 750);
     }
-    // Immediately update DB + optimistic state
     toggleChecked(id, true);
-    // Remove from exitingIds after animation completes (440ms collapse + 40ms buffer)
     setTimeout(() => {
       setExitingIds(prev => { const s = new Set(prev); s.delete(id); return s; });
     }, 480);
   };
 
   const updateItem = async (id, changes) => {
-    // Optimistic update
     setItems(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item));
     try {
       const res = await fetch(`${API}/items/${id}`, {
@@ -276,8 +302,7 @@ export default function App() {
       if (!res.ok) throw new Error('Failed to update item');
       const updated = await res.json();
       setItems(prev => prev.map(item => item.id === id ? updated : item));
-    } catch (e) {
-      // Revert optimistic update on failure
+    } catch {
       fetchItems();
     }
   };
@@ -290,12 +315,9 @@ export default function App() {
   const clearChecked = () => {
     const cleared = items.filter(i => i.checked);
     if (!cleared.length) return;
-    // Remove from UI immediately
     setItems(prev => prev.filter(i => !i.checked));
     setUndoItems(cleared);
-    // Cancel any pending undo timer
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    // Commit delete to DB after 5 s (unless undo is pressed)
     undoTimerRef.current = setTimeout(async () => {
       setUndoItems(null);
       try {
@@ -315,7 +337,7 @@ export default function App() {
     }
   };
 
-  /* ── Derived data ── */
+  /* ── Derived data (list view) ── */
   const filtered = tab === 'done'
     ? items.filter(i => i.checked)
     : items.filter(i => !i.checked || exitingIds.has(i.id));
@@ -335,130 +357,192 @@ export default function App() {
 
   return (
     <div className="app" ref={appRef}>
-      <header className="app-header">
-        <div className="header-top">
-          <div className="header-titles">
-            {editingListName ? (
-              <input
-                className="list-title-input"
-                value={tempListName}
-                onChange={e => setTempListName(e.target.value)}
-                onBlur={() => {
-                  if (tempListName.trim()) renameList(currentListId, tempListName.trim());
-                  setEditingListName(false);
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') { if (tempListName.trim()) renameList(currentListId, tempListName.trim()); setEditingListName(false); }
-                  if (e.key === 'Escape') setEditingListName(false);
-                }}
-                autoFocus
-              />
-            ) : (
-              <h1
-                className="list-title-editable"
-                onClick={() => { setTempListName(currentList?.name ?? ''); setEditingListName(true); }}
-              >
-                {currentList?.name ?? 'Grocery List'}
-                <span className="list-title-edit-hint">✏</span>
-              </h1>
-            )}
+
+      {/* ════════════════════════════════════════
+          HOME VIEW — lists overview
+      ════════════════════════════════════════ */}
+      {view === 'home' && (
+        <>
+          <div className="home-header">
+            <h1 className="home-title">My Lists</h1>
           </div>
-          <div className="header-right">
+
+          <div className="home-body">
+            {lists.length === 0 ? (
+              <div className="home-empty">
+                <span className="home-empty-icon">🛒</span>
+                <p className="home-empty-text">No lists yet</p>
+                <p className="home-empty-hint">Tap the button below to create your first list</p>
+              </div>
+            ) : (
+              <div className="home-lists">
+                {lists.map(list => {
+                  const stats = listStats[list.id];
+                  return (
+                    <button key={list.id} className="list-card" onClick={() => openList(list.id)}>
+                      <span className="list-card-name">{list.name}</span>
+                      <div className="list-card-badges">
+                        <span className="list-badge list-badge-shopping">
+                          {stats ? stats.shopping : '—'}
+                        </span>
+                        <span className="list-badge list-badge-done">
+                          {stats ? stats.done : '—'}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <button
-              ref={sortBtnRef}
-              className={`sort-icon-btn ${storeId ? 'store-active' : ''}`}
-              onClick={() => {
-                if (sortBtnRef.current && appRef.current) {
-                  const btnRect = sortBtnRef.current.getBoundingClientRect();
-                  const appRect = appRef.current.getBoundingClientRect();
-                  setSortPanelTop(Math.round(btnRect.bottom - appRect.top) + 8);
-                }
-                setSheet('sort');
-              }}
-              aria-label="Sort / store layout"
+              className="new-list-btn"
+              onClick={() => createList(`Shopping List ${lists.length + 1}`)}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="6"  x2="21" y2="6" />
-                <line x1="6" y1="12" x2="18" y2="12" />
-                <line x1="9" y1="18" x2="15" y2="18" />
-              </svg>
+              + New List
             </button>
           </div>
-        </div>
-        <div className="tab-row">
-          <button
-            className={`tab-btn ${tab === 'all' ? 'active' : ''}`}
-            onClick={() => setTab('all')}
-          >
-            Shopping
-            {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
-          </button>
-          <button
-            className={`tab-btn ${tab === 'done' ? 'active' : ''}`}
-            onClick={() => setTab('done')}
-          >
-            Done
-            {checkedCount > 0 && <span className="tab-count">{checkedCount}</span>}
-          </button>
-        </div>
-      </header>
+        </>
+      )}
 
-      <div className="scroll-area">
-        {loading && <p className="state-msg">Loading...</p>}
-        {error   && <p className="state-msg error">{error}</p>}
+      {/* ════════════════════════════════════════
+          LIST VIEW — shopping / done
+      ════════════════════════════════════════ */}
+      {view === 'list' && (
+        <>
+          <header className="app-header">
+            <div className="header-top">
+              {/* Back arrow → returns to home */}
+              <button className="back-home-btn" onClick={() => setView('home')} aria-label="Back to lists">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                  strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"/>
+                  <polyline points="12 19 5 12 12 5"/>
+                </svg>
+              </button>
 
-        {!loading && !error && sortedCategories.length === 0 && (
-          <div className="state-msg">
-            {tab === 'all' ? (
-              <>
-                <span style={{fontSize:40}}>🛒</span>
-                <span style={{marginTop:8,display:'block'}}>Your list is empty</span>
-                <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Tap + to add items</span>
-              </>
-            ) : (
-              <>
-                <span style={{fontSize:40}}>✅</span>
-                <span style={{marginTop:8,display:'block'}}>Nothing here yet</span>
-                <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Check items off your list</span>
-              </>
+              <div className="header-titles">
+                {editingListName ? (
+                  <input
+                    className="list-title-input"
+                    value={tempListName}
+                    onChange={e => setTempListName(e.target.value)}
+                    onBlur={() => {
+                      if (tempListName.trim()) renameList(currentListId, tempListName.trim());
+                      setEditingListName(false);
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') { if (tempListName.trim()) renameList(currentListId, tempListName.trim()); setEditingListName(false); }
+                      if (e.key === 'Escape') setEditingListName(false);
+                    }}
+                    autoFocus
+                  />
+                ) : (
+                  <h1
+                    className="list-title-editable"
+                    onClick={() => { setTempListName(currentList?.name ?? ''); setEditingListName(true); }}
+                  >
+                    {currentList?.name ?? 'Grocery List'}
+                    <span className="list-title-edit-hint">✏</span>
+                  </h1>
+                )}
+              </div>
+
+              <div className="header-right">
+                <button
+                  ref={sortBtnRef}
+                  className={`sort-icon-btn ${storeId ? 'store-active' : ''}`}
+                  onClick={() => {
+                    if (sortBtnRef.current && appRef.current) {
+                      const btnRect = sortBtnRef.current.getBoundingClientRect();
+                      const appRect = appRef.current.getBoundingClientRect();
+                      setSortPanelTop(Math.round(btnRect.bottom - appRect.top) + 8);
+                    }
+                    setSheet('sort');
+                  }}
+                  aria-label="Sort / store layout"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                    strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="6"  x2="21" y2="6" />
+                    <line x1="6" y1="12" x2="18" y2="12" />
+                    <line x1="9" y1="18" x2="15" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="tab-row">
+              <button className={`tab-btn ${tab === 'all' ? 'active' : ''}`} onClick={() => setTab('all')}>
+                Shopping
+                {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
+              </button>
+              <button className={`tab-btn ${tab === 'done' ? 'active' : ''}`} onClick={() => setTab('done')}>
+                Done
+                {checkedCount > 0 && <span className="tab-count">{checkedCount}</span>}
+              </button>
+            </div>
+          </header>
+
+          <div className="scroll-area">
+            {loading && <p className="state-msg">Loading...</p>}
+            {error   && <p className="state-msg error">{error}</p>}
+
+            {!loading && !error && sortedCategories.length === 0 && (
+              <div className="state-msg">
+                {tab === 'all' ? (
+                  <>
+                    <span style={{fontSize:40}}>🛒</span>
+                    <span style={{marginTop:8,display:'block'}}>Your list is empty</span>
+                    <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Tap + to add items</span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{fontSize:40}}>✅</span>
+                    <span style={{marginTop:8,display:'block'}}>Nothing here yet</span>
+                    <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Check items off your list</span>
+                  </>
+                )}
+              </div>
             )}
+
+            {sortedCategories.map(([category, catItems]) => (
+              <CategoryGroup
+                key={category}
+                category={category}
+                items={catItems}
+                onToggle={toggleChecked}
+                onCheck={checkItem}
+                onDelete={deleteItem}
+                onUpdate={updateItem}
+              />
+            ))}
           </div>
-        )}
 
-        {sortedCategories.map(([category, catItems]) => (
-          <CategoryGroup
-            key={category}
-            category={category}
-            items={catItems}
-            onToggle={toggleChecked}
-            onCheck={checkItem}
-            onDelete={deleteItem}
-            onUpdate={updateItem}
-          />
-        ))}
+          {tab === 'done' && checkedCount > 0 && (
+            <div className="done-footer">
+              <div className="done-footer-gradient" />
+              <div className="done-footer-buttons">
+                <button className="restore-all-btn"
+                  onClick={() => items.filter(i => i.checked).forEach(i => toggleChecked(i.id, false))}>
+                  ↩ Restore all
+                </button>
+                <button className="clear-all-btn" onClick={clearChecked}>
+                  Clear all
+                </button>
+              </div>
+            </div>
+          )}
 
-      </div>
-
-      {tab === 'done' && checkedCount > 0 && (
-        <div className="done-footer">
-          <div className="done-footer-gradient" />
-          <div className="done-footer-buttons">
-            <button className="restore-all-btn" onClick={() => items.filter(i => i.checked).forEach(i => toggleChecked(i.id, false))}>
-              ↩ Restore all
+          {undoItems && (
+            <button className="undo-clear-btn" onClick={undoClear}>
+              ↩ Undo Clear all
             </button>
-            <button className="clear-all-btn" onClick={clearChecked}>
-              Clear all
-            </button>
-          </div>
-        </div>
+          )}
+        </>
       )}
 
-      {undoItems && (
-        <button className="undo-clear-btn" onClick={undoClear}>
-          ↩ Undo Clear all
-        </button>
-      )}
-
+      {/* ── Sheets (accessible from both views) ── */}
       {sheet === 'sort' && (
         <SortSheet
           sortBy={sortBy}
@@ -467,18 +551,6 @@ export default function App() {
           onStoreChange={setStoreId}
           onClose={() => setSheet(null)}
           top={sortPanelTop}
-        />
-      )}
-
-      {sheet === 'lists' && (
-        <ListsSheet
-          lists={lists}
-          currentListId={currentListId}
-          onSwitch={id => { switchList(id); setItems([]); }}
-          onCreate={createList}
-          onRename={renameList}
-          onDelete={deleteList}
-          onClose={() => setSheet(null)}
         />
       )}
 
@@ -514,9 +586,17 @@ export default function App() {
         />
       )}
 
+      {/* ── Bottom navigation ── */}
       <BottomNav
-        onAddPress={() => setSheet('add')}
-        onListsPress={() => setSheet('lists')}
+        view={view}
+        onAddPress={() => {
+          if (view === 'home') {
+            createList(`Shopping List ${lists.length + 1}`);
+          } else {
+            setSheet('add');
+          }
+        }}
+        onGoHome={() => setView('home')}
         onUserPress={() => setSheet('user')}
         onVoiceStart={handleVoiceStart}
         onVoiceStop={handleVoiceStop}
