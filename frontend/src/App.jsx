@@ -76,6 +76,8 @@ export default function App() {
   const [storeId, setStoreId]               = useState(null);
   const [exitingIds, setExitingIds]         = useState(new Set());
   const [thumbAnim, setThumbAnim]           = useState(null);
+  const [undoItems, setUndoItems]           = useState(null);  // items pending undo-clear
+  const undoTimerRef                        = useRef(null);
   const voice = useVoiceInput();
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort' | 'user'
   const [customCategory, setCustomCategory] = useState('Other');
@@ -266,15 +268,31 @@ export default function App() {
     setItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const clearChecked = async () => {
-    // Optimistic removal first
-    setItems(prev => prev.filter(item => !item.checked));
-    try {
-      const res = await fetch(`${API}/items?listId=${currentListId}&checked=true`, { method: 'DELETE' });
-      if (!res.ok) throw new Error();
-    } catch {
-      // On failure, re-fetch so DB and UI stay in sync
-      fetchItems();
+  const clearChecked = () => {
+    const cleared = items.filter(i => i.checked);
+    if (!cleared.length) return;
+    // Remove from UI immediately
+    setItems(prev => prev.filter(i => !i.checked));
+    setUndoItems(cleared);
+    // Cancel any pending undo timer
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    // Commit delete to DB after 5 s (unless undo is pressed)
+    undoTimerRef.current = setTimeout(async () => {
+      setUndoItems(null);
+      try {
+        const res = await fetch(`${API}/items?listId=${currentListId}&checked=true`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+      } catch {
+        fetchItems();
+      }
+    }, 5000);
+  };
+
+  const undoClear = () => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    if (undoItems) {
+      setItems(prev => [...prev, ...undoItems]);
+      setUndoItems(null);
     }
   };
 
@@ -410,10 +428,16 @@ export default function App() {
               ↩ Restore all
             </button>
             <button className="clear-all-btn" onClick={clearChecked}>
-              🗑️ Clear all
+              Clear all
             </button>
           </div>
         </div>
+      )}
+
+      {undoItems && (
+        <button className="undo-clear-btn" onClick={undoClear}>
+          ↩ Undo Clear all
+        </button>
       )}
 
       {sheet === 'sort' && (

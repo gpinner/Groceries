@@ -96,8 +96,8 @@ export default function GroceryItem({ item, onToggle, onCheck, onDelete, onUpdat
           >
             <span className="check-ring" />
             {item.checked
-              ? <svg className="check-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              : <span className="restore-hint">↩</span>
+              ? <span className="restore-symbol">↩</span>
+              : null
             }
           </button>
 

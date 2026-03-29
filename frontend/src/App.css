@@ -224,6 +224,33 @@
 
 .clear-all-btn:hover { background: #FDDEDE; }
 
+/* ── Undo clear — centred floating button ── */
+.undo-clear-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  padding: 14px 28px;
+  background: rgba(120, 120, 120, 0.88);
+  color: #fff;
+  font-size: 15px;
+  font-weight: var(--fw-semibold);
+  border-radius: 50px;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  animation: fadeInScale 0.18s ease;
+}
+
+.undo-clear-btn:hover { background: rgba(100, 100, 100, 0.92); }
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.88); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 /* ── 👍 Thumb emoji portal — rendered at root level, above everything ── */
 @keyframes thumbFloat {
   0%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
