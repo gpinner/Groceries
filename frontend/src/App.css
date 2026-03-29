@@ -221,3 +221,19 @@
 }
 
 .clear-all-btn:hover { background: #FDDEDE; }
+
+/* ── 👍 Thumb emoji portal — rendered at root level, above everything ── */
+@keyframes thumbFloat {
+  0%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  55%  { opacity: 1; }
+  100% { transform: translate(-50%, calc(-50% - 75px)) scale(0.75); opacity: 0; }
+}
+
+.thumb-emoji-portal {
+  position: fixed;
+  font-size: 24px;
+  animation: thumbFloat 0.7s ease-out forwards;
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+}

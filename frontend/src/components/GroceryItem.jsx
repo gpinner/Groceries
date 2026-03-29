@@ -1,18 +1,16 @@
 import { useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { CATEGORIES } from './CategorySheet.jsx';
 import './GroceryItem.css';
 
 const UNITS = ['', 'pc', 'lb', 'oz', 'kg', 'g', 'L', 'mL', 'dozen', 'pack', 'can', 'bag', 'box'];
 
-export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
+export default function GroceryItem({ item, onToggle, onCheck, onDelete, onUpdate }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [qty, setQty]           = useState(item.quantity);
   const [editing, setEditing]   = useState(false);
   const [editName, setEditName] = useState(item.name);
   const [saving, setSaving]     = useState(false);
-  const [dimmed, setDimmed]         = useState(false);   // instant grey-out
-  const [thumbPos, setThumbPos]     = useState(null);    // portal position
+  const [dimmed, setDimmed]     = useState(false);
   const [collapsing, setCollapsing] = useState(false);
   const circleRef = useRef(null);
 
@@ -40,20 +38,16 @@ export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
       onToggle(item.id, false);
       return;
     }
-    // Capture circle position for the portal thumb
-    if (circleRef.current) {
+    // Capture circle position for the portal thumb (rendered in App)
+    const pos = circleRef.current ? (() => {
       const r = circleRef.current.getBoundingClientRect();
-      setThumbPos({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
-    }
-    // Grey text immediately, show thumb
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    })() : null;
+    // Immediately grey out and start collapse animation
     setDimmed(true);
-
-    // Hide thumb after 0.7s, then collapse
-    setTimeout(() => {
-      setThumbPos(null);
-      setCollapsing(true);
-      setTimeout(() => { onToggle(item.id, true); }, 440);
-    }, 700);
+    setCollapsing(true);
+    // Fire up to App to update DB + manage portal + filter
+    onCheck(item.id, pos);
   };
 
   const qtyLabel = `${item.quantity}${item.unit ? '\u202f' + item.unit : ''}`;
@@ -82,15 +76,6 @@ export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
 
   return (
     <>
-      {/* 👍 rendered as a portal — never clipped by any parent overflow */}
-      {thumbPos && createPortal(
-        <span
-          className="thumb-emoji-portal"
-          style={{ left: thumbPos.x, top: thumbPos.y }}
-        >👍</span>,
-        document.getElementById('root') ?? document.body
-      )}
-
       <li className={`grocery-item ${item.checked ? 'checked' : ''} ${menuOpen ? 'menu-open' : ''} ${dimmed ? 'dimmed' : ''} ${collapsing ? 'collapsing' : ''}`}>
         <div className="item-main">
           {/* Large check circle */}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import AddItemForm from './components/AddItemForm.jsx';
 import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
@@ -73,6 +74,8 @@ export default function App() {
   const [tab, setTab]                       = useState('all');
   const [sortBy, setSortBy]                 = useState('az');
   const [storeId, setStoreId]               = useState(null);
+  const [exitingIds, setExitingIds]         = useState(new Set());
+  const [thumbAnim, setThumbAnim]           = useState(null);
   const voice = useVoiceInput();
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort' | 'user'
   const [customCategory, setCustomCategory] = useState('Other');
@@ -215,6 +218,23 @@ export default function App() {
     }
   };
 
+  /* Check with animation — keeps item visible in shopping list during exit animation */
+  const checkItem = (id, pos) => {
+    // Add to exitingIds so it stays in the shopping filter during animation
+    setExitingIds(prev => new Set([...prev, id]));
+    // Show thumb emoji portal
+    if (pos) {
+      setThumbAnim(pos);
+      setTimeout(() => setThumbAnim(null), 750);
+    }
+    // Immediately update DB + optimistic state
+    toggleChecked(id, true);
+    // Remove from exitingIds after animation completes (440ms collapse + 40ms buffer)
+    setTimeout(() => {
+      setExitingIds(prev => { const s = new Set(prev); s.delete(id); return s; });
+    }, 480);
+  };
+
   const updateItem = async (id, changes) => {
     // Optimistic update
     setItems(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item));
@@ -245,8 +265,8 @@ export default function App() {
 
   /* ── Derived data ── */
   const filtered = tab === 'done'
-    ? items.filter(i => i.checked)
-    : items.filter(i => !i.checked);
+    ? items.filter(i => i.checked && !exitingIds.has(i.id))
+    : items.filter(i => !i.checked || exitingIds.has(i.id));
 
   const grouped = filtered.reduce((acc, item) => {
     acc[item.category] = acc[item.category] || [];
@@ -359,6 +379,7 @@ export default function App() {
             category={category}
             items={catItems}
             onToggle={toggleChecked}
+            onCheck={checkItem}
             onDelete={deleteItem}
             onUpdate={updateItem}
           />
@@ -438,6 +459,14 @@ export default function App() {
         onVoiceStop={handleVoiceStop}
         isListening={voice.listening}
       />
+
+      {thumbAnim && createPortal(
+        <span
+          className="thumb-emoji-portal"
+          style={{ left: thumbAnim.x, top: thumbAnim.y }}
+        >👍</span>,
+        document.getElementById('root') ?? document.body
+      )}
     </div>
   );
 }

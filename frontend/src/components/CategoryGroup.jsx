@@ -1,7 +1,7 @@
 import GroceryItem from './GroceryItem.jsx';
 import './CategoryGroup.css';
 
-export default function CategoryGroup({ category, items, onToggle, onDelete, onUpdate }) {
+export default function CategoryGroup({ category, items, onToggle, onCheck, onDelete, onUpdate }) {
   return (
     <div className="category-group">
       <div className="category-divider">
@@ -13,6 +13,7 @@ export default function CategoryGroup({ category, items, onToggle, onDelete, onU
             key={item.id}
             item={item}
             onToggle={onToggle}
+            onCheck={onCheck}
             onDelete={onDelete}
             onUpdate={onUpdate}
           />
