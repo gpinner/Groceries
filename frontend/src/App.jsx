@@ -62,6 +62,8 @@ function sortCategories(grouped, sortBy, storeId) {
   });
 }
 
+const LS_KEY = `groceries_listId_u${CURRENT_USER.id}`;
+
 export default function App() {
   const [lists, setLists]                   = useState([]);
   const [currentListId, setCurrentListId]   = useState(null);
@@ -74,9 +76,17 @@ export default function App() {
   const voice = useVoiceInput();
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort' | 'user'
   const [customCategory, setCustomCategory] = useState('Other');
+  const [editingListName, setEditingListName] = useState(false);
+  const [tempListName, setTempListName]       = useState('');
   const sortBtnRef                          = useRef(null);
   const appRef                              = useRef(null);
   const [sortPanelTop, setSortPanelTop]     = useState(60);
+
+  // Persist current list ID across reloads
+  const switchList = (id) => {
+    setCurrentListId(id);
+    try { localStorage.setItem(LS_KEY, String(id)); } catch {}
+  };
 
   // Load lists for the current user on mount
   useEffect(() => {
@@ -84,7 +94,11 @@ export default function App() {
       .then(r => r.json())
       .then(data => {
         setLists(data);
-        if (data.length > 0) setCurrentListId(data[0].id);
+        if (data.length === 0) return;
+        // Restore last-used list, fall back to first
+        const saved = (() => { try { return localStorage.getItem(LS_KEY); } catch { return null; } })();
+        const match = saved && data.find(l => l.id === Number(saved));
+        setCurrentListId(match ? match.id : data[0].id);
       })
       .catch(() => setError('Failed to load lists'));
   }, []);
@@ -116,7 +130,7 @@ export default function App() {
     });
     const list = await res.json();
     setLists(prev => [...prev, list]);
-    setCurrentListId(list.id);
+    switchList(list.id);
     setItems([]);
   };
 
@@ -143,7 +157,7 @@ export default function App() {
     const remaining = lists.filter(l => l.id !== id);
     setLists(remaining);
     if (currentListId === id) {
-      setCurrentListId(remaining[0]?.id ?? null);
+      switchList(remaining[0]?.id ?? null);
       setItems([]);
     }
   };
@@ -185,14 +199,20 @@ export default function App() {
     }
   };
 
-  /* Toggle checked — fire-and-forget so the item moves tabs instantly */
-  const toggleChecked = (id, checked) => {
+  /* Toggle checked — optimistic update, revert on API failure */
+  const toggleChecked = async (id, checked) => {
     setItems(prev => prev.map(i => i.id === id ? { ...i, checked } : i));
-    fetch(`${API}/items/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ checked }),
-    }).catch(() => {});
+    try {
+      const res = await fetch(`${API}/items/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checked }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      // Revert the optimistic update so DB and UI stay in sync
+      setItems(prev => prev.map(i => i.id === id ? { ...i, checked: !checked } : i));
+    }
   };
 
   const updateItem = async (id, changes) => {
@@ -246,7 +266,30 @@ export default function App() {
       <header className="app-header">
         <div className="header-top">
           <div className="header-titles">
-            <h1>{currentList?.name ?? 'Grocery List'}</h1>
+            {editingListName ? (
+              <input
+                className="list-title-input"
+                value={tempListName}
+                onChange={e => setTempListName(e.target.value)}
+                onBlur={() => {
+                  if (tempListName.trim()) renameList(currentListId, tempListName.trim());
+                  setEditingListName(false);
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { if (tempListName.trim()) renameList(currentListId, tempListName.trim()); setEditingListName(false); }
+                  if (e.key === 'Escape') setEditingListName(false);
+                }}
+                autoFocus
+              />
+            ) : (
+              <h1
+                className="list-title-editable"
+                onClick={() => { setTempListName(currentList?.name ?? ''); setEditingListName(true); }}
+              >
+                {currentList?.name ?? 'Grocery List'}
+                <span className="list-title-edit-hint">✏</span>
+              </h1>
+            )}
             <p className="subtitle">
               {pendingCount === 0 && checkedCount === 0
                 ? 'Your list is empty'
@@ -351,7 +394,7 @@ export default function App() {
         <ListsSheet
           lists={lists}
           currentListId={currentListId}
-          onSwitch={id => { setCurrentListId(id); setItems([]); }}
+          onSwitch={id => { switchList(id); setItems([]); }}
           onCreate={createList}
           onRename={renameList}
           onDelete={deleteList}

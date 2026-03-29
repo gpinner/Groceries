@@ -24,7 +24,8 @@
   gap: 8px;
 }
 
-.header-titles h1 {
+.header-titles h1,
+.list-title-editable {
   font-size: 26px;
   font-weight: var(--fw-extrabold);
   color: #1a1a1a;
@@ -33,6 +34,37 @@
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: -0.5px;
+}
+
+.list-title-editable {
+  cursor: text;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.list-title-edit-hint {
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  color: #8A9099;
+}
+
+.list-title-editable:hover .list-title-edit-hint { opacity: 1; }
+
+.list-title-input {
+  font-size: 22px;
+  font-weight: var(--fw-extrabold);
+  color: #1a1a1a;
+  border: none !important;
+  border-bottom: 2px solid #27AE60 !important;
+  border-radius: 0 !important;
+  padding: 0 0 2px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  max-width: 220px;
+  letter-spacing: -0.5px;
+  outline: none !important;
 }
 
 .subtitle {

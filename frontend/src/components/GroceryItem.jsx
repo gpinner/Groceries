@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { CATEGORIES } from './CategorySheet.jsx';
 import './GroceryItem.css';
 
@@ -10,6 +10,8 @@ export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
   const [editing, setEditing]   = useState(false);
   const [editName, setEditName] = useState(item.name);
   const [saving, setSaving]     = useState(false);
+  const [thumbAnim, setThumbAnim]   = useState(false);
+  const [collapsing, setCollapsing] = useState(false);
 
   // Sync qty if item changes externally
   if (qty !== item.quantity && !menuOpen) setQty(item.quantity);
@@ -27,6 +29,26 @@ export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
       await onUpdate(item.id, { name: editName.trim() });
       setEditing(false);
     } finally { setSaving(false); }
+  };
+
+  /* ── Check with animation ── */
+  const handleCheckClick = () => {
+    if (item.checked) {
+      // Restoring: no animation, instant
+      onToggle(item.id, false);
+      return;
+    }
+    // 1. Show 👍 floating up for 900ms
+    setThumbAnim(true);
+    setTimeout(() => {
+      setThumbAnim(false);
+      // 2. Collapse item over 450ms
+      setCollapsing(true);
+      // 3. After collapse, actually toggle so parent moves item to Done
+      setTimeout(() => {
+        onToggle(item.id, true);
+      }, 440);
+    }, 900);
   };
 
   const qtyLabel = `${item.quantity}${item.unit ? '\u202f' + item.unit : ''}`;
@@ -54,15 +76,16 @@ export default function GroceryItem({ item, onToggle, onDelete, onUpdate }) {
   }
 
   return (
-    <li className={`grocery-item ${item.checked ? 'checked' : ''} ${menuOpen ? 'menu-open' : ''}`}>
+    <li className={`grocery-item ${item.checked ? 'checked' : ''} ${menuOpen ? 'menu-open' : ''} ${collapsing ? 'collapsing' : ''}`}>
       <div className="item-main">
         {/* Large check circle */}
         <button
           className="check-circle"
-          onClick={() => onToggle(item.id, !item.checked)}
+          onClick={handleCheckClick}
           aria-label={item.checked ? 'Restore' : 'Done'}
         >
           <span className="check-ring" />
+          {thumbAnim && <span className="thumb-emoji">👍</span>}
           {item.checked
             ? <svg className="check-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             : <span className="restore-hint">↩</span>

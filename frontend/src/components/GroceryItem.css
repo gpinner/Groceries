@@ -1,9 +1,40 @@
 .grocery-item {
   background: #fff;
   border-bottom: 1px solid #F0F2F0;
+  overflow: hidden;
+  /* Smooth height collapse when item is removed */
+  max-height: 120px;
+  transition: max-height 0.44s ease, opacity 0.44s ease, padding 0.44s ease;
 }
 
+.grocery-item.menu-open { max-height: 280px; }
+
 .grocery-item:last-child { border-bottom: none; }
+
+/* ── Collapsing: item fades and slides up ── */
+.grocery-item.collapsing {
+  max-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── 👍 thumb emoji floating up ── */
+@keyframes thumbFloat {
+  0%   { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translate(-50%, calc(-50% - 50px)) scale(0.7); opacity: 0; }
+}
+
+.thumb-emoji {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: 20px;
+  animation: thumbFloat 0.95s ease-out forwards;
+  pointer-events: none;
+  z-index: 20;
+  user-select: none;
+}
 
 /* Main row */
 .item-main {
