@@ -11,6 +11,18 @@
 
 .grocery-item:last-child { border-bottom: none; }
 
+/* ── Immediate grey-out while checking ── */
+.grocery-item.dimmed .item-name {
+  color: #B8C0B8 !important;
+  text-decoration: line-through;
+  transition: none;
+}
+.grocery-item.dimmed .item-qty,
+.grocery-item.dimmed .item-sep {
+  color: #C8D0C8 !important;
+  transition: none;
+}
+
 /* ── Collapsing: item fades and slides up ── */
 .grocery-item.collapsing {
   max-height: 0 !important;
@@ -18,21 +30,19 @@
   pointer-events: none;
 }
 
-/* ── 👍 thumb emoji floating up ── */
+/* ── 👍 portal thumb — rendered outside all overflow:hidden containers ── */
 @keyframes thumbFloat {
-  0%   { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-  60%  { opacity: 1; }
-  100% { transform: translate(-50%, calc(-50% - 50px)) scale(0.7); opacity: 0; }
+  0%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  55%  { opacity: 1; }
+  100% { transform: translate(-50%, calc(-50% - 75px)) scale(0.75); opacity: 0; }
 }
 
-.thumb-emoji {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  font-size: 20px;
-  animation: thumbFloat 0.95s ease-out forwards;
+.thumb-emoji-portal {
+  position: fixed;
+  font-size: 24px;
+  animation: thumbFloat 0.7s ease-out forwards;
   pointer-events: none;
-  z-index: 20;
+  z-index: 9999;
   user-select: none;
 }
 

@@ -290,11 +290,6 @@ export default function App() {
                 <span className="list-title-edit-hint">✏</span>
               </h1>
             )}
-            <p className="subtitle">
-              {pendingCount === 0 && checkedCount === 0
-                ? 'Your list is empty'
-                : `${pendingCount} to buy · ${checkedCount} done`}
-            </p>
           </div>
           <div className="header-right">
             <button
@@ -324,12 +319,14 @@ export default function App() {
             onClick={() => setTab('all')}
           >
             Shopping
+            {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
           </button>
           <button
             className={`tab-btn ${tab === 'done' ? 'active' : ''}`}
             onClick={() => setTab('done')}
           >
-            Done {checkedCount > 0 ? `(${checkedCount})` : ''}
+            Done
+            {checkedCount > 0 && <span className="tab-count">{checkedCount}</span>}
           </button>
         </div>
       </header>

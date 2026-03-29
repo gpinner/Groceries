@@ -2,6 +2,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 let pool;
+let initialized = false;
 
 export function getPool() {
   if (!pool) pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -9,6 +10,8 @@ export function getPool() {
 }
 
 export async function init(pool) {
+  if (initialized) return;   // skip on warm invocations
+  initialized = true;
   // Users table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
