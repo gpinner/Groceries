@@ -211,12 +211,17 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ checked }),
       });
-      if (!res.ok) throw new Error('API error');
-      // Update with the actual saved value so UI always mirrors DB
+      if (!res.ok) throw new Error('API error ' + res.status);
       const saved = await res.json();
+      // Verify the DB actually saved the value we sent
+      if (Boolean(saved.checked) !== checked) {
+        console.error('DB did not persist checked value', { expected: checked, got: saved.checked });
+        throw new Error('checked mismatch');
+      }
       setItems(prev => prev.map(i => i.id === id ? saved : i));
-    } catch {
-      // Revert optimistic update on failure
+    } catch (err) {
+      console.error('toggleChecked failed:', err);
+      // Revert optimistic update on any failure
       setItems(prev => prev.map(i => i.id === id ? { ...i, checked: !checked } : i));
     }
   };

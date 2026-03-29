@@ -9,13 +9,27 @@ export default async function handler(req, res) {
     const { rows: existing } = await pool.query('SELECT * FROM items WHERE id = $1', [id]);
     if (!existing.length) return res.status(404).json({ error: 'Item not found' });
     const item = existing[0];
-    // Use explicit undefined check so that false / 0 are kept as-is
-    const body = req.body ?? {};
-    const name     = body.name     !== undefined ? String(body.name).trim()     : item.name;
-    const category = body.category !== undefined ? String(body.category).trim() : item.category;
-    const quantity = body.quantity !== undefined ? body.quantity                 : item.quantity;
-    const unit     = body.unit     !== undefined ? String(body.unit ?? '').trim(): (item.unit ?? '');
-    const checked  = body.checked  !== undefined ? Boolean(body.checked)        : item.checked;
+
+    // Robust body handling — guard against body-parsing failures
+    let body = req.body;
+    if (body === undefined || body === null || typeof body !== 'object') {
+      // Body parsing failed; try to reconstruct from raw chunks
+      try {
+        const chunks = [];
+        for await (const chunk of req) chunks.push(chunk);
+        const raw = Buffer.concat(chunks).toString();
+        body = raw ? JSON.parse(raw) : {};
+      } catch {
+        return res.status(400).json({ error: 'Invalid request body' });
+      }
+    }
+
+    const name     = body.name     !== undefined ? String(body.name).trim()      : item.name;
+    const category = body.category !== undefined ? String(body.category).trim()  : item.category;
+    const quantity = body.quantity !== undefined ? body.quantity                  : item.quantity;
+    const unit     = body.unit     !== undefined ? String(body.unit ?? '').trim() : (item.unit ?? '');
+    const checked  = body.checked  !== undefined ? Boolean(body.checked)         : item.checked;
+
     const { rows } = await pool.query(
       'UPDATE items SET name=$1, category=$2, quantity=$3, unit=$4, checked=$5 WHERE id=$6 RETURNING *',
       [name, category, quantity, unit, checked, id]

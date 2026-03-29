@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { CATEGORIES } from './CategorySheet.jsx';
 import './GroceryItem.css';
 
@@ -16,6 +16,15 @@ export default function GroceryItem({ item, onToggle, onCheck, onDelete, onUpdat
 
   // Sync qty if item changes externally
   if (qty !== item.quantity && !menuOpen) setQty(item.quantity);
+
+  // Reset animation state if the check was reverted (e.g. API failure)
+  // Without this, dimmed+collapsing CSS makes the item invisible forever
+  useEffect(() => {
+    if (!item.checked && (dimmed || collapsing)) {
+      setDimmed(false);
+      setCollapsing(false);
+    }
+  }, [item.checked]);
 
   const changeQty = async (next) => {
     const n = Math.max(0.5, Number((next).toFixed(1)));
