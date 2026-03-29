@@ -589,13 +589,7 @@ export default function App() {
       {/* ── Bottom navigation ── */}
       <BottomNav
         view={view}
-        onAddPress={() => {
-          if (view === 'home') {
-            createList(`Shopping List ${lists.length + 1}`);
-          } else {
-            setSheet('add');
-          }
-        }}
+        onAddPress={() => setSheet('add')}
         onGoHome={() => setView('home')}
         onUserPress={() => setSheet('user')}
         onVoiceStart={handleVoiceStart}

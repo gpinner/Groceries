@@ -35,8 +35,9 @@
   transition: color 0.15s;
 }
 
-/* Invisible spacer for home view left slot */
-.nav-placeholder {
+/* Spacer so Account stays right-aligned when center is empty */
+.nav-center-empty {
+  flex: 1;
   pointer-events: none;
 }
 

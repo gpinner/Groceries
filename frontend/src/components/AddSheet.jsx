@@ -160,7 +160,23 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
       <div className={`add-sheet ${expanded ? 'full' : 'half'}`}>
         <div className="sheet-handle" />
 
-        {/* Header — only when inside a category */}
+        {/* Search bar — PINNED AT TOP so the mobile keyboard never covers it */}
+        <div className="sheet-search-bar">
+          <div className="sheet-search-wrap">
+            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input ref={inputRef} className="sheet-search" type="text"
+              placeholder={selectedCat ? `Search in ${selectedCat}…` : 'Search products…'}
+              value={query} onChange={e => handleQueryChange(e.target.value)} />
+            {query && (
+              <button className="search-clear" onClick={() => handleQueryChange('')}>✕</button>
+            )}
+          </div>
+        </div>
+
+        {/* Category header — only when inside a category */}
         {showCatView && (
           <div className="sheet-cat-header">
             <button className="back-btn" onClick={handleBack}>←</button>
@@ -171,14 +187,9 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
           </div>
         )}
 
-        {/*
-          Recently added strip — sits OUTSIDE .sheet-body.
-          .sheet-body has overflow-x:hidden which would block horizontal
-          touch-scroll on this element.
-          touch-action: pan-x in .recent-scroll tells iOS/Android to handle
-          horizontal swipes here directly instead of deferring to a vertical
-          scroll ancestor.
-        */}
+        {/* Recently added strip — outside .sheet-body so overflow-x:hidden
+            on sheet-body doesn't kill horizontal touch-scroll.
+            touch-action:pan-x on .recent-scroll handles the rest. */}
         {showRecent && (
           <div className="recent-outer">
             <p className="sheet-section-label">Recently added</p>
@@ -275,22 +286,6 @@ export default function AddSheet({ onQuickAdd, onCustom, onClose, recentProducts
               )}
             </div>
           )}
-        </div>
-
-        {/* Search bar — always pinned at bottom */}
-        <div className="sheet-search-bar">
-          <div className="sheet-search-wrap">
-            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input ref={inputRef} className="sheet-search" type="text"
-              placeholder={selectedCat ? `Search in ${selectedCat}…` : 'Search products…'}
-              value={query} onChange={e => handleQueryChange(e.target.value)} />
-            {query && (
-              <button className="search-clear" onClick={() => handleQueryChange('')}>✕</button>
-            )}
-          </div>
         </div>
       </div>
     </>
