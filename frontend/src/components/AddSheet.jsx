@@ -80,7 +80,7 @@ function RecentChip({ name, category, done, onAdd }) {
   );
 }
 
-export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recentProducts = [] }) {
+export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recommendations = [] }) {
   const [query, setQuery]             = useState('');
   const [selectedCat, setSelectedCat] = useState(null);
   const [addedSet, setAddedSet]       = useState(new Set());
@@ -136,9 +136,8 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recen
   const showSearch  = !selectedCat && query.trim().length > 0;
   const showCatView = !!selectedCat;
   const showGrid    = !selectedCat && !query.trim();
-  // 25 items max, reversed so newest appears at the end of the grid
-  const recent10    = recentProducts.slice(0, 10).reverse();
-  const showRecent  = recent10.length > 0 && !query.trim() && !selectedCat;
+  // Recommendations are pre-sorted by score — show up to 10
+  const showRec = recommendations.length > 0 && !query.trim() && !selectedCat;
 
   return (
     <div className={`add-panel${closing ? ' closing' : ''}`}>
@@ -189,12 +188,12 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recen
       {/* ── Scrollable content area ── */}
       <div className="add-panel-body">
 
-        {/* Recently added — 3-col grid, inside scrollable body, newest at end */}
-        {showRecent && (
+        {/* Recommended products — scored by personal history + popular defaults */}
+        {showRec && (
           <div className="recent-outer">
-            <p className="sheet-section-label">Recently added</p>
+            <p className="sheet-section-label">Recommended</p>
             <div className="recent-grid">
-              {recent10.map(({ name, category }) => (
+              {recommendations.map(({ name, category }) => (
                 <RecentChip
                   key={name}
                   name={name}

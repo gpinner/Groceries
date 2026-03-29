@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import AddItemForm from './components/AddItemForm.jsx';
 import AddSheet from './components/AddSheet.jsx';
@@ -11,6 +11,8 @@ import VoiceModal from './components/VoiceModal.jsx';
 import { useVoiceInput } from './hooks/useVoiceInput.js';
 import { PRODUCTS } from './data/products.js';
 import { STORES } from './data/stores.js';
+import { POPULAR_PRODUCTS } from './data/popularProducts.js';
+import { getRecommendations } from './utils/recommendations.js';
 import './App.css';
 
 // Flatten product list for voice matching
@@ -63,8 +65,9 @@ function sortCategories(grouped, sortBy, storeId) {
   });
 }
 
-const LS_KEY        = `groceries_listId_u${CURRENT_USER.id}`;
-const LS_RECENT_KEY = `groceries_recent_u${CURRENT_USER.id}`;
+const LS_KEY         = `groceries_listId_u${CURRENT_USER.id}`;
+const LS_PRODS_KEY   = `groceries_prods_u${CURRENT_USER.id}`;
+const LS_RECENT_KEY  = `groceries_recent_u${CURRENT_USER.id}`; // legacy — migrated below
 
 export default function App() {
   const [view, setView]                     = useState('home'); // 'home' | 'list'
@@ -81,10 +84,37 @@ export default function App() {
   const [thumbAnim, setThumbAnim]           = useState(null);
   const [undoItems, setUndoItems]           = useState(null);
   const undoTimerRef                        = useRef(null);
-  const [recentProducts, setRecentProducts] = useState(() => {
-    try { const d = localStorage.getItem(LS_RECENT_KEY); return d ? JSON.parse(d) : []; }
-    catch { return []; }
+  // Tracked products: { name, category, addCount, lastAdded, firstAdded }
+  // Migrates automatically from old flat { name, category } recent format.
+  const [trackedProducts, setTrackedProducts] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LS_PRODS_KEY);
+      if (saved) return JSON.parse(saved);
+
+      // Migrate old recent list — spread timestamps over past weeks so the
+      // scoring function has realistic data to work with immediately.
+      const old = localStorage.getItem(LS_RECENT_KEY);
+      if (old) {
+        const migrated = JSON.parse(old).map((p, i) => ({
+          name:       p.name,
+          category:   p.category,
+          addCount:   2,
+          lastAdded:  Date.now() - (i + 1) * 8 * 86_400_000, // ~weekly spacing
+          firstAdded: Date.now() - (i + 2) * 8 * 86_400_000,
+        }));
+        localStorage.setItem(LS_PRODS_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+      return [];
+    } catch { return []; }
   });
+
+  // Recommendations: derived from trackedProducts + popular defaults.
+  // Re-evaluated any time trackedProducts changes (e.g. after a quick-add).
+  const recommendations = useMemo(
+    () => getRecommendations(trackedProducts, POPULAR_PRODUCTS),
+    [trackedProducts]
+  );
   const voice = useVoiceInput();
   const [sheet, setSheet]                   = useState(null);
   const [addPanelClosing, setAddPanelClosing] = useState(false);
@@ -223,11 +253,22 @@ export default function App() {
     }, 260);
   };
 
-  const trackRecent = (name, category) => {
-    setRecentProducts(prev => {
-      // Newest at front (index 0); max 25. Displayed reversed so newest appears at the END.
-      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 25);
-      try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(next)); } catch {}
+  const trackProduct = (name, category) => {
+    setTrackedProducts(prev => {
+      const now     = Date.now();
+      const existing = prev.find(p => p.name === name);
+      let next;
+      if (existing) {
+        next = prev.map(p => p.name === name
+          ? { ...p, addCount: p.addCount + 1, lastAdded: now }
+          : p
+        );
+      } else {
+        next = [{ name, category, addCount: 1, lastAdded: now, firstAdded: now }, ...prev];
+      }
+      // Keep max 100 products sorted by most recently added
+      next = next.sort((a, b) => b.lastAdded - a.lastAdded).slice(0, 100);
+      try { localStorage.setItem(LS_PRODS_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
   };
@@ -237,7 +278,7 @@ export default function App() {
     const existing = items.find(i => i.name === name && !i.checked);
     if (existing) {
       await updateItem(existing.id, { quantity: (Number(existing.quantity) || 1) + 1 });
-      trackRecent(name, category);
+      trackProduct(name, category);
       return;
     }
     const res = await fetch(`${API}/items`, {
@@ -248,7 +289,7 @@ export default function App() {
     if (!res.ok) return;
     const item = await res.json();
     setItems(prev => [...prev, item]);
-    trackRecent(name, category);
+    trackProduct(name, category);
   };
 
   /* ── Voice ── */
@@ -509,7 +550,7 @@ export default function App() {
               onQuickAdd={quickAdd}
               onCustom={cat => { setCustomCategory(cat ?? 'Other'); setSheet('custom'); }}
               onClose={closeAddPanel}
-              recentProducts={recentProducts}
+              recommendations={recommendations}
             />
           ) : (
             <div className="scroll-area">
