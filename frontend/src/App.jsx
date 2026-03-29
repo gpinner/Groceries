@@ -63,7 +63,8 @@ function sortCategories(grouped, sortBy, storeId) {
   });
 }
 
-const LS_KEY = `groceries_listId_u${CURRENT_USER.id}`;
+const LS_KEY        = `groceries_listId_u${CURRENT_USER.id}`;
+const LS_RECENT_KEY = `groceries_recent_u${CURRENT_USER.id}`;
 
 export default function App() {
   const [lists, setLists]                   = useState([]);
@@ -76,8 +77,12 @@ export default function App() {
   const [storeId, setStoreId]               = useState(null);
   const [exitingIds, setExitingIds]         = useState(new Set());
   const [thumbAnim, setThumbAnim]           = useState(null);
-  const [undoItems, setUndoItems]           = useState(null);  // items pending undo-clear
+  const [undoItems, setUndoItems]           = useState(null);
   const undoTimerRef                        = useRef(null);
+  const [recentProducts, setRecentProducts] = useState(() => {
+    try { const d = localStorage.getItem(LS_RECENT_KEY); return d ? JSON.parse(d) : []; }
+    catch { return []; }
+  });
   const voice = useVoiceInput();
   const [sheet, setSheet]                   = useState(null);   // null | 'lists' | 'add' | 'custom' | 'sort' | 'user'
   const [customCategory, setCustomCategory] = useState('Other');
@@ -180,8 +185,22 @@ export default function App() {
     setSheet(null);
   };
 
+  // Quick-add from the sheet — does NOT close the sheet
   const quickAdd = async (name, category) => {
-    await addItem({ name, category, quantity: 1, unit: '' });
+    const res = await fetch(`${API}/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, category, quantity: 1, unit: '', list_id: currentListId }),
+    });
+    if (!res.ok) return;
+    const item = await res.json();
+    setItems(prev => [...prev, item]);
+    // Track in recent products (deduplicate, keep newest first, max 10)
+    setRecentProducts(prev => {
+      const next = [{ name, category }, ...prev.filter(p => p.name !== name)].slice(0, 10);
+      try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   /* ── Voice ── */
@@ -465,9 +484,10 @@ export default function App() {
 
       {sheet === 'add' && (
         <AddSheet
-          onAdd={quickAdd}
+          onQuickAdd={quickAdd}
           onCustom={cat => { setCustomCategory(cat ?? 'Other'); setSheet('custom'); }}
           onClose={() => setSheet(null)}
+          recentProducts={recentProducts}
         />
       )}
 
