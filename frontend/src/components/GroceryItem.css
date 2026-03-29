@@ -1,6 +1,6 @@
 .grocery-item {
   background: #fff;
-  border-bottom: 1px solid #F0F2F0;
+  border-bottom: 1px solid #EEF8F7;
   overflow: hidden;
   /* Smooth height collapse when item is removed */
   max-height: 120px;
@@ -29,7 +29,6 @@
   opacity: 0;
   pointer-events: none;
 }
-
 
 /* Main row */
 .item-main {
@@ -64,18 +63,18 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid #D8E8D8;
+  border: 2px solid #C1E2DE;
   background: #fff;
   transition: border-color 0.18s, background 0.18s;
 }
 
 .check-circle:hover .check-ring {
-  border-color: #27AE60;
+  border-color: #82C6C8;
 }
 
 .grocery-item.checked .check-ring {
-  background: #27AE60;
-  border-color: #27AE60;
+  background: #82C6C8;
+  border-color: #82C6C8;
 }
 
 .check-tick {
@@ -101,8 +100,8 @@
 }
 
 .grocery-item.checked .check-circle:hover .check-ring {
-  background: #1E9B54;
-  border-color: #1E9B54;
+  background: #6BAEB0;
+  border-color: #6BAEB0;
 }
 
 /* ── Name + qty inline ── */
@@ -173,12 +172,12 @@
 
 .menu-dots:hover,
 .menu-dots.active {
-  background: #F0F4F0;
+  background: #EEF8F7;
 }
 
 .menu-dots:hover span,
 .menu-dots.active span {
-  background: #27AE60;
+  background: #82C6C8;
 }
 
 /* ── Inline flyout ── */
@@ -187,8 +186,8 @@
   align-items: center;
   gap: 0;
   padding: 10px 16px 12px 70px;
-  background: #F8FAF8;
-  border-top: 1px solid #F0F2F0;
+  background: #F5FCFC;
+  border-top: 1px solid #EEF8F7;
   animation: expandDown 0.18s ease;
 }
 
@@ -203,7 +202,7 @@
   align-items: center;
   gap: 0;
   background: #fff;
-  border: 1.5px solid #E8EEE8;
+  border: 1.5px solid #C1E2DE;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -213,7 +212,7 @@
   height: 36px;
   font-size: 20px;
   font-weight: 300;
-  color: #27AE60;
+  color: #82C6C8;
   background: transparent;
   border-radius: 0;
   display: flex;
@@ -222,8 +221,8 @@
   line-height: 1;
 }
 
-.qty-btn:hover { background: #F0FAF4; }
-.qty-btn:active { background: #E0F5E8 !important; }
+.qty-btn:hover  { background: #EEF8F7; }
+.qty-btn:active { background: #D8F0EE !important; }
 
 .qty-value {
   min-width: 48px;
@@ -232,8 +231,8 @@
   font-weight: var(--fw-bold);
   color: #1a1a1a;
   padding: 0 4px;
-  border-left: 1px solid #E8EEE8;
-  border-right: 1px solid #E8EEE8;
+  border-left: 1px solid #C1E2DE;
+  border-right: 1px solid #C1E2DE;
 }
 
 /* Divider */
@@ -265,15 +264,15 @@
   margin-right: 4px;
 }
 
-.flyout-edit:hover { background: #EFF8F3; color: #27AE60; }
+.flyout-edit:hover { background: #EEF8F7; color: #82C6C8; }
 
 .flyout-delete { color: #E74C3C; }
 .flyout-delete:hover { background: #FEF0EE; }
 
 /* ── Edit mode ── */
 .grocery-item.editing {
-  background: #FAFCFA;
-  border-bottom: 1px solid #E8EEE8;
+  background: #F5FCFC;
+  border-bottom: 1px solid #C1E2DE;
 }
 
 .grocery-item.editing .item-main { display: none; }
@@ -282,14 +281,14 @@
   width: 100%;
   font-size: 16px;
   padding: 14px 16px;
-  border: 2px solid #E0E8E0;
+  border: 2px solid #C1E2DE;
   border-radius: 14px;
   margin: 14px 16px 0;
   width: calc(100% - 32px);
   font-weight: var(--fw-medium);
 }
 
-.edit-name:focus { border-color: #27AE60; box-shadow: 0 0 0 3px rgba(39,174,96,0.1); }
+.edit-name:focus { border-color: #82C6C8; box-shadow: 0 0 0 3px rgba(130,198,200,0.15); }
 
 .edit-actions {
   display: flex;
@@ -300,22 +299,22 @@
 .save-btn {
   flex: 1;
   padding: 13px;
-  background: #27AE60;
+  background: #82C6C8;
   color: #fff;
   font-weight: var(--fw-bold);
   font-size: 15px;
   border-radius: 12px;
 }
 
-.save-btn:not(:disabled):hover { background: #1E9B54; }
+.save-btn:not(:disabled):hover { background: #6BAEB0; }
 
 .cancel-btn {
   padding: 13px 18px;
-  background: #F0F4F0;
+  background: #EEF8F7;
   color: #4A5568;
   font-size: 14px;
   font-weight: var(--fw-semibold);
   border-radius: 12px;
 }
 
-.cancel-btn:hover { background: #E5EBE5; }
+.cancel-btn:hover { background: #D8F0EE; }

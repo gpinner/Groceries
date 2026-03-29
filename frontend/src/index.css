@@ -16,7 +16,7 @@
 
 body {
   font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #D6E8D6;
+  background: #C1E2DE;
   color: #1a1a1a;
   min-height: 100vh;
   display: flex;
@@ -28,7 +28,7 @@ body {
 #root {
   width: 390px;
   height: 844px;
-  background: #F6F8F6;
+  background: #FFFDF3;
   border-radius: 50px;
   box-shadow:
     0 0 0 10px #111,
@@ -91,7 +91,7 @@ input, select {
   font-family: 'Noto Sans', sans-serif;
   font-weight: var(--fw-regular);
   font-size: 15px;
-  border: 1.5px solid #D8E8D8;
+  border: 1.5px solid #C1E2DE;
   border-radius: 12px;
   padding: 12px 14px;
   outline: none;
@@ -100,6 +100,6 @@ input, select {
 }
 
 input:focus, select:focus {
-  border-color: #27AE60;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
+  border-color: #82C6C8;
+  box-shadow: 0 0 0 3px rgba(130, 198, 200, 0.18);
 }

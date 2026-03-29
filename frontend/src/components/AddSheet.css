@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #F6F8F6;
+  background: #FFFDF3;
   min-height: 0;
 }
 
@@ -29,7 +29,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px 6px 8px;
-  background: #27AE60;
+  background: #82C6C8;
 }
 
 /* ← back / close button */
@@ -65,7 +65,7 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: #27AE60;
+  color: #82C6C8;
 }
 
 .add-search-input {
@@ -79,14 +79,14 @@
   box-shadow: none !important;
   color: #1a1a1a;
   min-width: 0;
-  caret-color: #27AE60;
+  caret-color: #82C6C8;
 }
 
 .add-search-input:focus        { border: none !important; box-shadow: none !important; }
 .add-search-input::placeholder { color: #A8B4A8; font-weight: var(--fw-regular); }
 
 .search-clear {
-  background: #F0F4F0;
+  background: #EEF8F7;
   color: #4A5568;
   font-size: 13px;
   font-weight: var(--fw-bold);
@@ -114,7 +114,7 @@
   flex-shrink: 0;
   padding: 10px 18px 4px;
   background: #fff;
-  border-bottom: 1px solid #F2F5F2;
+  border-bottom: 1px solid #E8F4F3;
 }
 
 .add-cat-breadcrumb-label {
@@ -135,10 +135,10 @@
   padding: 10px 18px 6px;
 }
 
-/* ── Recently added — 2-col grid, condensed rows ── */
+/* ── Recommendation slot grid ── */
 .recent-outer {
   background: #fff;
-  border-bottom: 1px solid #F2F5F2;
+  border-bottom: 1px solid #E8F4F3;
   padding-bottom: 4px;
 }
 
@@ -168,7 +168,7 @@
   gap: 8px;
   padding: 0 12px;
   height: 40px;
-  background: #F0F4F0;
+  background: #EEF8F7;
   border-radius: 12px;
   border: 1.5px solid transparent;
   touch-action: manipulation;
@@ -177,13 +177,13 @@
   overflow: hidden;
 }
 
-/* Phase: checking — ✓ green flash */
+/* Phase: checking — ✓ teal flash */
 .recent-chip.phase-checking {
-  background: #E8F8EE;
-  border-color: #27AE60;
+  background: #D8F0EE;
+  border-color: #82C6C8;
   pointer-events: none;
 }
-.recent-chip.phase-checking .recent-chip-emoji { color: #27AE60; }
+.recent-chip.phase-checking .recent-chip-emoji { color: #82C6C8; }
 
 /* Phase: fading — 50% → 0 over 3s */
 .recent-chip.phase-fading {
@@ -224,7 +224,7 @@
 .sheet-section { margin-bottom: 4px; }
 
 /*
-  Category grid — class is .add-category-grid (NOT .category-grid) to avoid
+  Category grid — .add-category-grid (NOT .category-grid) to avoid
   conflict with CategorySheet.css which defines .category-grid as 4 columns.
 */
 .add-category-grid {
@@ -240,20 +240,20 @@
   align-items: center;
   gap: 8px;
   padding: 20px 6px;
-  background: #C8E6D4;
+  background: #C1E2DE;
   border-radius: 18px;
-  border: 1.5px solid #A8D4BB;
+  border: 1.5px solid #9DD5D7;
   touch-action: manipulation;
 }
 
-.add-category-tile:active { background: #A8D4BB; }
+.add-category-tile:active { background: #9DD5D7; }
 
 .add-cat-emoji { font-size: 28px; line-height: 1; }
 
 .add-cat-name {
   font-size: 12px;
   font-weight: var(--fw-bold);
-  color: #1D5C40;
+  color: #2A7A7C;
   text-align: center;
   line-height: 1.25;
 }
@@ -269,13 +269,13 @@
   width: 100%;
   padding: 13px 14px 13px 18px;
   background: transparent;
-  border-bottom: 1px solid #F5F7F5;
+  border-bottom: 1px solid #EEF8F7;
   text-align: left;
   touch-action: manipulation;
 }
 
 .product-row:last-child { border-bottom: none; }
-.product-row:active     { background: #F8FBF8; }
+.product-row:active     { background: #F5FCFC; }
 
 .product-row-emoji { font-size: 22px; line-height: 1; flex-shrink: 0; }
 
@@ -298,42 +298,42 @@
 
 .product-cat-badge { font-size: 12px; font-weight: var(--fw-medium); color: #8A9099; }
 
-/* Green + circle — search results */
+/* Teal + circle — search results */
 .product-add {
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: #27AE60; color: #fff;
+  background: #82C6C8; color: #fff;
   font-size: 20px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; line-height: 1;
-  box-shadow: 0 2px 6px rgba(39,174,96,0.3);
+  box-shadow: 0 2px 6px rgba(130,198,200,0.35);
 }
 
 /* Grey + circle — category product rows */
 .product-add-grey {
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: #F6F8F6; color: #8A9099;
+  background: #FFFDF3; color: #8A9099;
   font-size: 20px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; line-height: 1;
-  border: 1.5px solid #E8EDE8;
+  border: 1.5px solid #C1E2DE;
 }
 
 /* ✓ feedback */
 .product-added {
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: #E8F8EE; color: #27AE60;
+  background: #D8F0EE; color: #82C6C8;
   font-size: 16px; font-weight: var(--fw-bold);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 
 /* ── Custom query row ── */
-.custom-query-row { border-top: 2px dashed #D8E8D8; margin-top: 6px; background: #F8FBF8; }
-.custom-query-row:active { background: #EFF8F3; }
-.custom-hint { color: #27AE60 !important; font-weight: var(--fw-semibold); font-style: italic; }
+.custom-query-row { border-top: 2px dashed #C1E2DE; margin-top: 6px; background: #F5FCFC; }
+.custom-query-row:active { background: #E4F4F4; }
+.custom-hint { color: #82C6C8 !important; font-weight: var(--fw-semibold); font-style: italic; }
 
 /* ── Common card grid ── */
 .common-grid {
@@ -346,16 +346,16 @@
 .common-card {
   display: flex; flex-direction: column; align-items: center;
   gap: 5px; padding: 12px 6px;
-  background: #F6F8F6; border-radius: 14px;
+  background: #EEF8F7; border-radius: 14px;
   border: 1.5px solid transparent; text-align: center;
   touch-action: manipulation;
 }
 
-.common-card:active     { background: #EFF8F3; border-color: #27AE60; }
-.common-card.card-added { background: #E8F8EE; border-color: #27AE60; }
+.common-card:active     { background: #D8F0EE; border-color: #82C6C8; }
+.common-card.card-added { background: #D8F0EE; border-color: #82C6C8; }
 
 .common-card-emoji { font-size: 26px; line-height: 1; }
-.common-card.card-added .common-card-emoji { font-size: 18px; color: #27AE60; }
+.common-card.card-added .common-card-emoji { font-size: 18px; color: #82C6C8; }
 
 .common-card-name {
   font-size: 12px; font-weight: var(--fw-semibold);

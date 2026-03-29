@@ -24,7 +24,7 @@
 .sheet-handle {
   width: 44px;
   height: 4px;
-  background: #E0E8E0;
+  background: #C1E2DE;
   border-radius: 2px;
   margin: 14px auto 4px;
 }
@@ -48,33 +48,33 @@
   flex: 1;
   font-size: 16px;
   padding: 14px 16px;
-  border: 2px solid #E0E8E0;
+  border: 2px solid #C1E2DE;
   border-radius: 14px;
   font-weight: var(--fw-medium);
 }
 
 .name-input:focus {
-  border-color: #27AE60;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.10);
+  border-color: #82C6C8;
+  box-shadow: 0 0 0 3px rgba(130, 198, 200, 0.15);
 }
 
 .qty-input {
   width: 80px;
   padding: 14px 12px;
-  border: 2px solid #E0E8E0;
+  border: 2px solid #C1E2DE;
   border-radius: 14px;
   text-align: center;
 }
 
 .qty-input:focus {
-  border-color: #27AE60;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.10);
+  border-color: #82C6C8;
+  box-shadow: 0 0 0 3px rgba(130, 198, 200, 0.15);
 }
 
 .cat-select {
   flex: 1;
   padding: 14px 16px;
-  border: 2px solid #E0E8E0;
+  border: 2px solid #C1E2DE;
   border-radius: 14px;
   font-size: 15px;
   appearance: none;
@@ -84,7 +84,7 @@
 }
 
 .cat-select:focus {
-  border-color: #27AE60;
+  border-color: #82C6C8;
 }
 
 .actions {
@@ -94,7 +94,7 @@
 .add-btn {
   flex: 1;
   padding: 15px;
-  background: #27AE60;
+  background: #82C6C8;
   color: #fff;
   font-size: 16px;
   font-weight: var(--fw-bold);
@@ -102,18 +102,18 @@
   letter-spacing: 0.2px;
 }
 
-.add-btn:not(:disabled):hover { background: #1E9B54; }
+.add-btn:not(:disabled):hover { background: #6BAEB0; }
 
 .cancel-btn {
   padding: 15px 20px;
-  background: #F0F4F0;
+  background: #EEF8F7;
   color: #4A5568;
   font-size: 15px;
   font-weight: var(--fw-bold);
   border-radius: 14px;
 }
 
-.cancel-btn:hover { background: #E5EBE5; }
+.cancel-btn:hover { background: #D8F0EE; }
 
 .form-error {
   font-size: 13px;

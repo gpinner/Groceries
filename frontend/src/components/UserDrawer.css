@@ -31,7 +31,7 @@
   align-items: center;
   gap: 14px;
   padding: 52px 16px 20px;
-  background: #27AE60;
+  background: #82C6C8;
 }
 
 .drawer-avatar {
@@ -88,7 +88,7 @@
 /* ── Sections ── */
 .drawer-section {
   padding: 8px 0 4px;
-  border-bottom: 1px solid #F2F5F2;
+  border-bottom: 1px solid #E8F4F3;
 }
 
 .drawer-section:last-of-type { border-bottom: none; }
@@ -113,7 +113,7 @@
   transition: background 0.12s;
 }
 
-.drawer-row:hover { background: #F8FAF8; }
+.drawer-row:hover { background: #F5FCFC; }
 
 .drawer-row-icon {
   font-size: 18px;

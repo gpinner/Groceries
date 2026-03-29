@@ -5,7 +5,7 @@
   right: 0;
   height: 72px;
   background: #ffffff;
-  border-top: 1px solid #EEF2EE;
+  border-top: 1px solid #D8EFEE;
   display: flex;
   align-items: stretch;
   z-index: 50;
@@ -41,13 +41,13 @@
   pointer-events: none;
 }
 
-/* Active green Lists button — shown when inside a list */
+/* Active teal Lists button — shown when inside a list */
 .nav-lists-active {
-  color: #27AE60;
+  color: #82C6C8;
 }
 
 .nav-lists-active .nav-icon {
-  stroke: #27AE60;
+  stroke: #82C6C8;
 }
 
 .nav-icon {
@@ -62,16 +62,16 @@
   letter-spacing: 0.3px;
 }
 
-/* ── Center green zone ── */
+/* ── Center teal CTA zone ── */
 .nav-add {
-  background: #27AE60;
+  background: #82C6C8;
   color: #fff;
   align-self: stretch;
   transition: background 0.15s;
   box-shadow: -6px 0 14px rgba(0, 0, 0, 0.08), 6px 0 14px rgba(0, 0, 0, 0.08);
 }
 
-.nav-add:active { background: #1E9B4E !important; }
+.nav-add:active { background: #6BAEB0 !important; }
 
 .nav-add.listening {
   background: #E74C3C;

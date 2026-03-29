@@ -13,20 +13,20 @@
   /* top set via inline style */
   left: 12px;
   right: 12px;
-  bottom: auto;          /* shrinks to content by default */
+  bottom: auto;
   background: #fff;
   z-index: 70;
   display: flex;
   flex-direction: column;
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
-  border-radius: 20px;   /* all four corners */
+  border-radius: 20px;
   animation: slideDown 0.22s cubic-bezier(0.32, 0.72, 0, 1);
   overflow: hidden;
 }
 
 /* Fills to bottom when store list is visible */
 .sort-panel.expanded {
-  bottom: 12px;          /* keep bottom gap for rounded corners */
+  bottom: 12px;
 }
 
 /* ── Toggle row — never scrolls ── */
@@ -36,14 +36,14 @@
 }
 
 .sort-panel.expanded .sort-panel-header {
-  border-bottom: 1px solid #F0F2F0;
+  border-bottom: 1px solid #D8EFEE;
   padding-bottom: 10px;
 }
 
 .sort-toggle-group {
   display: flex;
   gap: 0;
-  background: #F0F4F0;
+  background: #EEF8F7;
   border-radius: 14px;
   padding: 4px;
 }
@@ -60,9 +60,9 @@
 }
 
 .sort-toggle-btn.active {
-  background: #27AE60;
+  background: #82C6C8;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.32);
+  box-shadow: 0 2px 8px rgba(130, 198, 200, 0.35);
 }
 
 /* ── Store list — scrollable ── */
@@ -81,22 +81,22 @@
   gap: 14px;
   width: 100%;
   padding: 12px 20px;
-  border-bottom: 1px solid #F4F6F4;
+  border-bottom: 1px solid #EEF8F7;
   background: #fff;
   transition: background 0.12s;
 }
 
-.store-row:hover  { background: #F8FAF8; }
-.store-row:active { background: #EFF8F3; }
+.store-row:hover  { background: #F5FCFC; }
+.store-row:active { background: #EEF8F7; }
 
-.store-row.active { background: #EFF8F3; }
+.store-row.active { background: #EEF8F7; }
 
 /* Logo circle */
 .store-logo-wrap {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: #F8FAF8;
+  background: #F5FCFC;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
   display: flex;
   align-items: center;
@@ -114,7 +114,7 @@
 .store-initials {
   font-size: 16px;
   font-weight: var(--fw-black);
-  color: #27AE60;
+  color: #82C6C8;
   letter-spacing: -0.5px;
 }
 
@@ -126,13 +126,13 @@
   text-align: left;
 }
 
-.store-row.active .store-row-name { color: #27AE60; }
+.store-row.active .store-row-name { color: #82C6C8; }
 
-/* Green checkmark on the right */
+/* Teal checkmark on the right */
 .store-check {
   width: 24px;
   height: 24px;
-  background: #27AE60;
+  background: #82C6C8;
   border-radius: 50%;
   display: flex;
   align-items: center;
