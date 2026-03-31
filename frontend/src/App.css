@@ -15,6 +15,9 @@
   background: #fff;
   flex-shrink: 0;
   border-bottom: 1px solid #D8EFEE;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .home-title {
@@ -125,22 +128,20 @@
   max-width: 220px;
 }
 
-/* New list button — below the list cards */
-.new-list-btn {
-  width: 100%;
-  margin-top: 14px;
-  padding: 16px;
-  background: #D8F0EE;
-  color: #2A7A7C;
-  font-size: 15px;
-  font-weight: var(--fw-bold);
-  border-radius: 18px;
-  border: 1.5px dashed #9DD5D7 !important;
-  letter-spacing: 0.2px;
+.home-add-btn {
+  width: 36px;
+  height: 36px;
+  background: #82C6C8;
+  color: #fff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   touch-action: manipulation;
 }
 
-.new-list-btn:active { background: #C1E2DE; }
+.home-add-btn:active { background: #6BAEB0; }
 
 /* ════════════════════════════════════════
    LIST VIEW header additions
@@ -431,4 +432,104 @@
   pointer-events: none;
   z-index: 9999;
   user-select: none;
+}
+
+/* ── Rename sheet ── */
+.rename-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 60;
+  animation: fadeIn 0.2s ease;
+}
+
+.rename-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  padding: 0 20px 90px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: renameSlideUp 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+
+@keyframes renameSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.rename-handle {
+  width: 44px;
+  height: 4px;
+  background: #C1E2DE;
+  border-radius: 2px;
+  margin: 14px auto 4px;
+}
+
+.rename-title {
+  font-size: 17px;
+  font-weight: var(--fw-extrabold);
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.rename-input {
+  width: 100%;
+  font-size: 16px;
+  padding: 14px 16px;
+  border: 2px solid #C1E2DE;
+  border-radius: 14px;
+  font-weight: var(--fw-medium);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.rename-input:focus {
+  border-color: #82C6C8;
+  box-shadow: 0 0 0 3px rgba(130,198,200,0.15);
+}
+
+.rename-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.rename-cancel {
+  padding: 14px 20px;
+  background: #EEF8F7;
+  color: #4A5568;
+  font-size: 15px;
+  font-weight: var(--fw-bold);
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.rename-save {
+  flex: 1;
+  padding: 14px;
+  background: #82C6C8;
+  color: #fff;
+  font-size: 15px;
+  font-weight: var(--fw-bold);
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.rename-save:not(:disabled):hover { background: #6BAEB0; }
+
+.rename-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }

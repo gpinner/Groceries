@@ -8,6 +8,8 @@ import ListsSheet from './components/ListsSheet.jsx';
 import SortSheet from './components/SortSheet.jsx';
 import UserDrawer from './components/UserDrawer.jsx';
 import VoiceModal from './components/VoiceModal.jsx';
+import ListCard from './components/ListCard.jsx';
+import PatternPicker from './components/PatternPicker.jsx';
 import { useVoiceInput } from './hooks/useVoiceInput.js';
 import { PRODUCTS } from './data/products.js';
 import { STORES } from './data/stores.js';
@@ -65,9 +67,10 @@ function sortCategories(grouped, sortBy, storeId) {
   });
 }
 
-const LS_KEY         = `groceries_listId_u${CURRENT_USER.id}`;
-const LS_PRODS_KEY   = `groceries_prods_u${CURRENT_USER.id}`;
-const LS_RECENT_KEY  = `groceries_recent_u${CURRENT_USER.id}`; // legacy — migrated below
+const LS_KEY          = `groceries_listId_u${CURRENT_USER.id}`;
+const LS_PRODS_KEY    = `groceries_prods_u${CURRENT_USER.id}`;
+const LS_RECENT_KEY   = `groceries_recent_u${CURRENT_USER.id}`; // legacy — migrated below
+const LS_PATTERNS_KEY = `groceries_patterns_u${CURRENT_USER.id}`;
 
 export default function App() {
   const [view, setView]                     = useState('home'); // 'home' | 'list'
@@ -124,6 +127,13 @@ export default function App() {
   const sortBtnRef                          = useRef(null);
   const appRef                              = useRef(null);
   const [sortPanelTop, setSortPanelTop]     = useState(60);
+  const [listPatterns, setListPatternsState] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(LS_PATTERNS_KEY) ?? '{}'); }
+    catch { return {}; }
+  });
+  const [renamingListId, setRenamingListId] = useState(null);
+  const [renameValue, setRenameValue]       = useState('');
+  const [pickerListId, setPickerListId]     = useState(null);
 
   // Persist current list ID across reloads
   const switchList = (id) => {
@@ -194,6 +204,14 @@ export default function App() {
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
   /* ── List CRUD ── */
+  const setListPattern = (listId, patternId) => {
+    setListPatternsState(prev => {
+      const next = { ...prev, [listId]: patternId };
+      try { localStorage.setItem(LS_PATTERNS_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
   const createList = async (name) => {
     const res = await fetch(`${API}/lists`, {
       method: 'POST',
@@ -202,7 +220,9 @@ export default function App() {
     });
     const list = await res.json();
     setLists(prev => [...prev, list]);
-    openList(list.id);
+    // Open rename sheet so user can set a real name
+    setRenameValue(name);
+    setRenamingListId(list.id);
   };
 
   const renameList = async (id, name) => {
@@ -431,6 +451,16 @@ export default function App() {
         <>
           <div className="home-header">
             <h1 className="home-title">My Lists</h1>
+            <button
+              className="home-add-btn"
+              onClick={() => createList(`My List ${lists.length + 1}`)}
+              aria-label="New list"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
           </div>
 
           <div className="home-body">
@@ -438,35 +468,24 @@ export default function App() {
               <div className="home-empty">
                 <span className="home-empty-icon">🛒</span>
                 <p className="home-empty-text">No lists yet</p>
-                <p className="home-empty-hint">Tap the button below to create your first list</p>
+                <p className="home-empty-hint">Tap + to create your first list</p>
               </div>
             ) : (
               <div className="home-lists">
-                {lists.map(list => {
-                  const stats = listStats[list.id];
-                  return (
-                    <button key={list.id} className="list-card" onClick={() => openList(list.id)}>
-                      <span className="list-card-name">{list.name}</span>
-                      <div className="list-card-badges">
-                        <span className="list-badge list-badge-shopping">
-                          {stats ? stats.shopping : '—'}
-                        </span>
-                        <span className="list-badge list-badge-done">
-                          {stats ? stats.done : '—'}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
+                {lists.map(list => (
+                  <ListCard
+                    key={list.id}
+                    list={list}
+                    stats={listStats[list.id]}
+                    patternId={listPatterns[list.id] ?? list.id % 9}
+                    onOpen={() => openList(list.id)}
+                    onRename={() => { setRenameValue(list.name); setRenamingListId(list.id); }}
+                    onDelete={() => deleteList(list.id)}
+                    onChangePattern={() => setPickerListId(list.id)}
+                  />
+                ))}
               </div>
             )}
-
-            <button
-              className="new-list-btn"
-              onClick={() => createList(`Shopping List ${lists.length + 1}`)}
-            >
-              + New List
-            </button>
           </div>
         </>
       )}
@@ -658,6 +677,52 @@ export default function App() {
         <UserDrawer
           user={CURRENT_USER}
           onClose={() => setSheet(null)}
+        />
+      )}
+
+      {/* ── Rename sheet ── */}
+      {renamingListId && (
+        <div className="rename-backdrop" onClick={() => setRenamingListId(null)}>
+          <div className="rename-sheet" onClick={e => e.stopPropagation()}>
+            <div className="rename-handle" />
+            <p className="rename-title">Rename list</p>
+            <input
+              className="rename-input"
+              value={renameValue}
+              onChange={e => setRenameValue(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && renameValue.trim()) {
+                  renameList(renamingListId, renameValue.trim());
+                  setRenamingListId(null);
+                }
+                if (e.key === 'Escape') setRenamingListId(null);
+              }}
+              autoFocus
+              placeholder="List name"
+            />
+            <div className="rename-actions">
+              <button className="rename-cancel" onClick={() => setRenamingListId(null)}>Cancel</button>
+              <button
+                className="rename-save"
+                disabled={!renameValue.trim()}
+                onClick={() => {
+                  if (renameValue.trim()) {
+                    renameList(renamingListId, renameValue.trim());
+                    setRenamingListId(null);
+                  }
+                }}
+              >Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Pattern picker ── */}
+      {pickerListId && (
+        <PatternPicker
+          currentId={listPatterns[pickerListId] ?? pickerListId % 9}
+          onSelect={id => setListPattern(pickerListId, id)}
+          onClose={() => setPickerListId(null)}
         />
       )}
 
