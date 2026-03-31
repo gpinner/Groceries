@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IconX, IconCheck, IconPencil, IconTrash, IconPlus } from '@tabler/icons-react';
 import './ListsSheet.css';
 
 export default function ListsSheet({ lists, currentListId, onSwitch, onCreate, onRename, onDelete, onClose }) {
@@ -48,22 +49,22 @@ export default function ListsSheet({ lists, currentListId, onSwitch, onCreate, o
                     autoFocus
                   />
                   <button className="list-save-btn" onClick={() => handleRename(list.id)}>Save</button>
-                  <button className="list-cancel-btn" onClick={() => setEditingId(null)}>✕</button>
+                  <button className="list-cancel-btn" onClick={() => setEditingId(null)}><IconX size={16} /></button>
                 </div>
               ) : (
                 <>
                   <button className="list-name-btn" onClick={() => { onSwitch(list.id); onClose(); }}>
-                    <span className="list-check">{list.id === currentListId ? '✓' : ''}</span>
+                    <span className="list-check">{list.id === currentListId ? <IconCheck size={16} /> : ''}</span>
                     <span className="list-name">{list.name}</span>
                   </button>
                   <div className="list-actions">
-                    <button className="list-icon-btn" onClick={() => startEdit(list)} title="Rename">✏️</button>
+                    <button className="list-icon-btn" onClick={() => startEdit(list)} title="Rename"><IconPencil size={17} /></button>
                     <button
                       className="list-icon-btn delete"
                       onClick={() => handleDelete(list.id)}
                       disabled={lists.length === 1}
                       title="Delete"
-                    >🗑️</button>
+                    ><IconTrash size={17} /></button>
                   </div>
                 </>
               )}
@@ -82,11 +83,11 @@ export default function ListsSheet({ lists, currentListId, onSwitch, onCreate, o
               placeholder="List name"
             />
             <button className="list-save-btn" onClick={handleCreate}>Create</button>
-            <button className="list-cancel-btn" onClick={() => { setCreating(false); setNewName('New List'); }}>✕</button>
+            <button className="list-cancel-btn" onClick={() => { setCreating(false); setNewName('New List'); }}><IconX size={16} /></button>
           </div>
         ) : (
           <button className="new-list-btn" onClick={() => setCreating(true)}>
-            + New List
+            <IconPlus size={16} /> New List
           </button>
         )}
       </div>

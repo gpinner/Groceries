@@ -1,17 +1,22 @@
 import { useState } from 'react';
+import {
+  IconSearch, IconX,
+  IconLeaf, IconMilk, IconMeat, IconBread, IconSnowflake,
+  IconArchive, IconBottle, IconCookie, IconHome, IconPackage,
+} from '@tabler/icons-react';
 import './CategorySheet.css';
 
 export const CATEGORIES = [
-  { name: 'Produce',        emoji: '🥦' },
-  { name: 'Dairy',          emoji: '🥛' },
-  { name: 'Meat & Seafood', emoji: '🥩' },
-  { name: 'Bakery',         emoji: '🍞' },
-  { name: 'Frozen',         emoji: '🧊' },
-  { name: 'Pantry',         emoji: '🥫' },
-  { name: 'Beverages',      emoji: '🥤' },
-  { name: 'Snacks',         emoji: '🍿' },
-  { name: 'Household',      emoji: '🧹' },
-  { name: 'Other',          emoji: '📦' },
+  { name: 'Produce',        emoji: '🥦', Icon: IconLeaf      },
+  { name: 'Dairy',          emoji: '🥛', Icon: IconMilk      },
+  { name: 'Meat & Seafood', emoji: '🥩', Icon: IconMeat      },
+  { name: 'Bakery',         emoji: '🍞', Icon: IconBread     },
+  { name: 'Frozen',         emoji: '🧊', Icon: IconSnowflake },
+  { name: 'Pantry',         emoji: '🥫', Icon: IconArchive   },
+  { name: 'Beverages',      emoji: '🥤', Icon: IconBottle    },
+  { name: 'Snacks',         emoji: '🍿', Icon: IconCookie    },
+  { name: 'Household',      emoji: '🧹', Icon: IconHome      },
+  { name: 'Other',          emoji: '📦', Icon: IconPackage   },
 ];
 
 export default function CategorySheet({ onSelect, onClose }) {
@@ -29,7 +34,7 @@ export default function CategorySheet({ onSelect, onClose }) {
         <h2 className="sheet-title">What are you adding?</h2>
 
         <div className="sheet-search-wrap">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><IconSearch size={17} /></span>
           <input
             className="sheet-search"
             type="text"
@@ -39,7 +44,7 @@ export default function CategorySheet({ onSelect, onClose }) {
             autoFocus
           />
           {query && (
-            <button className="search-clear" onClick={() => setQuery('')}>✕</button>
+            <button className="search-clear" onClick={() => setQuery('')}><IconX size={16} /></button>
           )}
         </div>
 
@@ -47,9 +52,9 @@ export default function CategorySheet({ onSelect, onClose }) {
           {filtered.length === 0 && (
             <p className="no-results">No categories found</p>
           )}
-          {filtered.map(({ name, emoji }) => (
+          {filtered.map(({ name, Icon }) => (
             <button key={name} className="category-tile" onClick={() => onSelect(name)}>
-              <span className="cat-emoji">{emoji}</span>
+              <span className="cat-emoji"><Icon size={26} strokeWidth={1.75} /></span>
               <span className="cat-name">{name}</span>
             </button>
           ))}

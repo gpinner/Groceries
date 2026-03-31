@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { CATEGORIES } from './CategorySheet.jsx';
+import { IconPencil, IconTrash, IconPlus, IconMinus, IconCheck, IconArrowBackUp } from '@tabler/icons-react';
 import './GroceryItem.css';
 
 const UNITS = ['', 'pc', 'lb', 'oz', 'kg', 'g', 'L', 'mL', 'dozen', 'pack', 'can', 'bag', 'box'];
@@ -96,7 +96,7 @@ export default function GroceryItem({ item, onToggle, onCheck, onDelete, onUpdat
           >
             <span className="check-ring" />
             {item.checked
-              ? <span className="restore-symbol">↩</span>
+              ? <span className="restore-symbol"><IconArrowBackUp size={16} /></span>
               : null
             }
           </button>
@@ -122,27 +122,19 @@ export default function GroceryItem({ item, onToggle, onCheck, onDelete, onUpdat
         {menuOpen && (
           <div className="item-flyout">
             <div className="flyout-qty">
-              <button className="qty-btn minus" onClick={() => changeQty(qty - 1)}>−</button>
+              <button className="qty-btn minus" onClick={() => changeQty(qty - 1)}><IconMinus size={16} /></button>
               <span className="qty-value">{qty}{item.unit ? '\u202f' + item.unit : ''}</span>
-              <button className="qty-btn plus" onClick={() => changeQty(qty + 1)}>+</button>
+              <button className="qty-btn plus" onClick={() => changeQty(qty + 1)}><IconPlus size={16} /></button>
             </div>
             <div className="flyout-divider" />
             {!item.checked && (
               <button className="flyout-edit" onClick={() => { setMenuOpen(false); setEditing(true); }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
+                <IconPencil size={17} />
                 Rename
               </button>
             )}
             <button className="flyout-delete" onClick={() => onDelete(item.id)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6"/><path d="M14 11v6"/>
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
+              <IconTrash size={17} />
               Delete
             </button>
           </div>
