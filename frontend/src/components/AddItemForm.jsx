@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IconPackage } from '@tabler/icons-react';
 import { CATEGORIES } from '../data/categories.js';
 import './AddItemForm.css';
 
@@ -28,7 +29,7 @@ export default function AddItemForm({ initialCategory = 'Other', onAdd, onCancel
     }
   };
 
-  const catEmoji = CATEGORIES.find(c => c.name === category)?.emoji ?? '📦';
+  const CatIcon = CATEGORIES.find(c => c.name === category)?.Icon ?? IconPackage;
 
   return (
     <>
@@ -36,7 +37,7 @@ export default function AddItemForm({ initialCategory = 'Other', onAdd, onCancel
       <form className="add-form" onSubmit={handleSubmit}>
         <div className="sheet-handle" />
         <div className="add-category-label">
-          <span>{catEmoji}</span> {category}
+          <CatIcon size={18} strokeWidth={1.75} /> {category}
         </div>
         <div className="add-form-row">
           <input

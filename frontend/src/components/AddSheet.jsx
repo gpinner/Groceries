@@ -1,4 +1,10 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import {
+  IconSearch, IconX, IconCheck, IconPlus,
+  IconLeaf, IconMilk, IconMeat, IconFish, IconBread, IconSnowflake,
+  IconArchive, IconBottle, IconCookie, IconHome, IconSpray, IconPackage,
+  IconTag, IconArrowLeft,
+} from '@tabler/icons-react';
 import { CATEGORIES } from '../data/categories.js';
 import { PRODUCTS }   from '../data/products.js';
 import './AddSheet.css';
@@ -8,8 +14,11 @@ const ALL_PRODUCTS = Object.entries(PRODUCTS).flatMap(([cat, { common, all }]) =
   [...new Set([...common, ...all])].map(name => ({ name, category: cat }))
 );
 
-// Build category emoji lookup from current names
+// Build category emoji lookup from current names (kept for productEmoji fallback)
 const CAT_EMOJI = Object.fromEntries(CATEGORIES.map(c => [c.name, c.emoji]));
+
+// Build category icon lookup from current names
+const CAT_ICON = Object.fromEntries(CATEGORIES.map(c => [c.name, c.Icon]));
 
 // Legacy category names that may still exist in localStorage
 const LEGACY_CAT_EMOJI = {
@@ -24,6 +33,25 @@ const LEGACY_CAT_EMOJI = {
   'Frozen': '🧊',
   'Other': '📦',
 };
+
+const LEGACY_CAT_ICON = {
+  'Produce': IconLeaf,
+  'Meat & Seafood': IconMeat, 'Meat': IconMeat,
+  'Seafood': IconFish,
+  'Deli': IconBread, 'Bakery': IconBread,
+  'Dairy': IconMilk,
+  'Snacks': IconCookie,
+  'Pantry': IconArchive,
+  'Beverages': IconBottle, 'Drinks': IconBottle,
+  'Household': IconHome,
+  'Personal Care': IconSpray,
+  'Frozen': IconSnowflake,
+  'Other': IconPackage,
+};
+
+function getCategoryIcon(cat) {
+  return CAT_ICON[cat] ?? LEGACY_CAT_ICON[cat] ?? IconTag;
+}
 
 const PRODUCT_EMOJIS = {
   'Bananas':'🍌','Apples':'🍎','Tomatoes':'🍅','Onions':'🧅','Potatoes':'🥔',
@@ -78,7 +106,7 @@ function RecSlot({ name, category, phase, onAdd }) {
       disabled={!interactive}
     >
       <span className="recent-chip-emoji">
-        {phase === 'checking' ? '✓' : productEmoji(name, category)}
+        {phase === 'checking' ? <IconCheck size={16} /> : productEmoji(name, category)}
       </span>
       <span className="recent-chip-name">{name}</span>
     </button>
@@ -203,18 +231,11 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
       <div className="add-search-bar">
         {/* Back / close */}
         <button className="add-search-close" onClick={selectedCat ? handleBack : onClose} aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-            strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"/>
-            <polyline points="12 19 5 12 12 5"/>
-          </svg>
+          <IconArrowLeft size={20} />
         </button>
 
         <div className="add-search-wrap">
-          <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
+          <IconSearch className="search-icon" size={18} />
           <input
             ref={inputRef}
             className="add-search-input"
@@ -224,7 +245,7 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
             onChange={e => handleQueryChange(e.target.value)}
           />
           {query && (
-            <button className="search-clear" onClick={() => handleQueryChange('')}>✕</button>
+            <button className="search-clear" onClick={() => handleQueryChange('')}><IconX size={16} /></button>
           )}
         </div>
 
@@ -237,7 +258,7 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
       {showCatView && (
         <div className="add-cat-breadcrumb">
           <span className="add-cat-breadcrumb-label">
-            {CAT_EMOJI[selectedCat]} {selectedCat}
+            {(() => { const Ci = getCategoryIcon(selectedCat); return <Ci size={16} />; })()} {selectedCat}
           </span>
         </div>
       )}
@@ -268,9 +289,9 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
           <div className="sheet-section">
             <p className="sheet-section-label">Categories</p>
             <div className="add-category-grid">
-              {CATEGORIES.map(({ name, emoji }) => (
+              {CATEGORIES.map(({ name, Icon }) => (
                 <button key={name} className="add-category-tile" onClick={() => handleCatSelect(name)}>
-                  <span className="add-cat-emoji">{emoji}</span>
+                  <span className="add-cat-emoji"><Icon size={26} strokeWidth={1.75} /></span>
                   <span className="add-cat-name">{name}</span>
                 </button>
               ))}
@@ -288,12 +309,12 @@ export default function AddSheet({ closing, onQuickAdd, onCustom, onClose, recom
                 <div className="product-row-info">
                   <span className="product-name">{name}</span>
                   <span className="product-cat-badge">
-                    {CAT_EMOJI[category] ?? '🏷️'} {category}
+                    <span style={{display:'inline-flex',verticalAlign:'middle'}}>{(() => { const Ci = getCategoryIcon(category); return <Ci size={14} />; })()}</span> {category}
                   </span>
                 </div>
                 {addedSet.has(name)
-                  ? <span className="product-added">✓</span>
-                  : <span className="product-add">+</span>}
+                  ? <span className="product-added"><IconCheck size={16} /></span>
+                  : <span className="product-add"><IconPlus size={16} /></span>}
               </button>
             ))}
             <CustomQueryRow query={query} onAdd={n => handleAdd(n, 'Other')} />
@@ -350,8 +371,8 @@ function CategoryProductRows({ items, category, onAdd, addedSet }) {
       <span className="product-row-emoji">{productEmoji(name, category)}</span>
       <span className="product-name">{name}</span>
       {addedSet.has(name)
-        ? <span className="product-added">✓</span>
-        : <span className="product-add-grey">+</span>}
+        ? <span className="product-added"><IconCheck size={16} /></span>
+        : <span className="product-add-grey"><IconPlus size={16} /></span>}
     </button>
   ));
 }
@@ -367,7 +388,7 @@ function QuickSection({ title, items, addedSet, onAdd }) {
           return (
             <button key={name} className={`common-card ${done ? 'card-added' : ''}`}
               onClick={() => onAdd(name, category)}>
-              <span className="common-card-emoji">{done ? '✓' : emoji}</span>
+              <span className="common-card-emoji">{done ? <IconCheck size={18} /> : emoji}</span>
               <span className="common-card-name">{name}</span>
             </button>
           );
@@ -385,7 +406,7 @@ function CustomQueryRow({ query, onAdd }) {
         <span className="product-name">{query.trim()}</span>
         <span className="product-cat-badge custom-hint">Tap to add this item</span>
       </div>
-      <span className="product-add">+</span>
+      <span className="product-add"><IconPlus size={16} /></span>
     </button>
   );
 }

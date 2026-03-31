@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { IconArrowLeft, IconSearch, IconX, IconPlus, IconPackage } from '@tabler/icons-react';
 import { CATEGORIES } from '../data/categories.js';
 import { PRODUCTS } from '../data/products.js';
 import './ProductSheet.css';
@@ -6,7 +7,7 @@ import './ProductSheet.css';
 export default function ProductSheet({ category, onAdd, onBack, onCustom }) {
   const [query, setQuery] = useState('');
 
-  const emoji = CATEGORIES.find(c => c.name === category)?.emoji ?? '📦';
+  const CatIcon = CATEGORIES.find(c => c.name === category)?.Icon ?? IconPackage;
   const data   = PRODUCTS[category] ?? { common: [], all: [] };
 
   const { common, rest } = useMemo(() => {
@@ -29,14 +30,14 @@ export default function ProductSheet({ category, onAdd, onBack, onCustom }) {
 
         {/* Header */}
         <div className="product-header">
-          <button className="back-btn" onClick={onBack}>←</button>
-          <span className="product-title">{emoji} {category}</span>
+          <button className="back-btn" onClick={onBack}><IconArrowLeft size={20} /></button>
+          <span className="product-title"><CatIcon size={20} /> {category}</span>
           <button className="custom-btn" onClick={onCustom}>Custom</button>
         </div>
 
         {/* Search */}
         <div className="sheet-search-wrap">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><IconSearch size={17} /></span>
           <input
             className="sheet-search"
             type="text"
@@ -45,7 +46,7 @@ export default function ProductSheet({ category, onAdd, onBack, onCustom }) {
             onChange={e => setQuery(e.target.value)}
             autoFocus
           />
-          {query && <button className="search-clear" onClick={() => setQuery('')}>✕</button>}
+          {query && <button className="search-clear" onClick={() => setQuery('')}><IconX size={16} /></button>}
         </div>
 
         {/* Product list */}
@@ -76,7 +77,7 @@ function Section({ title, items, onAdd }) {
       {items.map(name => (
         <button key={name} className="product-row" onClick={() => onAdd(name)}>
           <span className="product-name">{name}</span>
-          <span className="product-add">+</span>
+          <span className="product-add"><IconPlus size={16} /></span>
         </button>
       ))}
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { IconPlus, IconArrowLeft, IconAdjustments, IconShoppingCart, IconPencil, IconArrowBackUp, IconCircleCheck, IconThumbUp } from '@tabler/icons-react';
 import AddItemForm from './components/AddItemForm.jsx';
 import AddSheet from './components/AddSheet.jsx';
 import CategoryGroup from './components/CategoryGroup.jsx';
@@ -456,17 +457,14 @@ export default function App() {
               onClick={() => createList(`My List ${lists.length + 1}`)}
               aria-label="New list"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
+              <IconPlus size={20} strokeWidth={2.5} />
             </button>
           </div>
 
           <div className="home-body">
             {lists.length === 0 ? (
               <div className="home-empty">
-                <span className="home-empty-icon">🛒</span>
+                <span className="home-empty-icon"><IconShoppingCart size={48} strokeWidth={1.5} /></span>
                 <p className="home-empty-text">No lists yet</p>
                 <p className="home-empty-hint">Tap + to create your first list</p>
               </div>
@@ -499,11 +497,7 @@ export default function App() {
             <div className="header-top">
               {/* Back arrow → returns to home */}
               <button className="back-home-btn" onClick={() => setView('home')} aria-label="Back to lists">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                  strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12"/>
-                  <polyline points="12 19 5 12 12 5"/>
-                </svg>
+                <IconArrowLeft size={22} strokeWidth={2.5} />
               </button>
 
               <div className="header-titles">
@@ -528,7 +522,7 @@ export default function App() {
                     onClick={() => { setTempListName(currentList?.name ?? ''); setEditingListName(true); }}
                   >
                     {currentList?.name ?? 'Grocery List'}
-                    <span className="list-title-edit-hint">✏</span>
+                    <span className="list-title-edit-hint"><IconPencil size={14} /></span>
                   </h1>
                 )}
               </div>
@@ -547,12 +541,7 @@ export default function App() {
                   }}
                   aria-label="Sort / store layout"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-                    strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="3" y1="6"  x2="21" y2="6" />
-                    <line x1="6" y1="12" x2="18" y2="12" />
-                    <line x1="9" y1="18" x2="15" y2="18" />
-                  </svg>
+                  <IconAdjustments size={22} strokeWidth={2} />
                 </button>
               </div>
             </div>
@@ -594,13 +583,13 @@ export default function App() {
                 <div className="state-msg">
                   {tab === 'all' ? (
                     <>
-                      <span style={{fontSize:40}}>🛒</span>
+                      <span style={{display:'flex',justifyContent:'center'}}><IconShoppingCart size={40} strokeWidth={1.5} /></span>
                       <span style={{marginTop:8,display:'block'}}>Your list is empty</span>
                       <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Tap + to add items</span>
                     </>
                   ) : (
                     <>
-                      <span style={{fontSize:40}}>✅</span>
+                      <span style={{display:'flex',justifyContent:'center'}}><IconCircleCheck size={40} strokeWidth={1.5} /></span>
                       <span style={{marginTop:8,display:'block'}}>Nothing here yet</span>
                       <span style={{fontSize:13,color:'#B0B8B0',marginTop:4,display:'block'}}>Check items off your list</span>
                     </>
@@ -628,7 +617,7 @@ export default function App() {
               <div className="done-footer-buttons">
                 <button className="restore-all-btn"
                   onClick={() => items.filter(i => i.checked).forEach(i => toggleChecked(i.id, false))}>
-                  ↩ Restore all
+                  <IconArrowBackUp size={16} /> Restore all
                 </button>
                 <button className="clear-all-btn" onClick={clearChecked}>
                   Clear all
@@ -639,7 +628,7 @@ export default function App() {
 
           {undoItems && (
             <button className="undo-clear-btn" onClick={undoClear}>
-              ↩ Undo Clear all
+              <IconArrowBackUp size={16} /> Undo Clear all
             </button>
           )}
         </>
@@ -741,7 +730,7 @@ export default function App() {
         <span
           className="thumb-emoji-portal"
           style={{ left: thumbAnim.x, top: thumbAnim.y }}
-        >👍</span>,
+        ><IconThumbUp size={36} strokeWidth={1.5} /></span>,
         document.getElementById('root') ?? document.body
       )}
     </div>
